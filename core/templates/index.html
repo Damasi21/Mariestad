@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+
+{% block title %}Início - Apolux{% endblock %}
+
+{% block content %}
+<div class="container text-center mt-5">
+    <div class="row">
+        <!-- Clientes -->
+        <div class="col-md-4">
+            <a href="{% url 'cadastro_clientes' %}" class="text-decoration-none text-dark">
+                <div class="card shadow-sm p-3">
+                    <div class="card-body">
+                        <i class="bi bi-people fs-1 text-primary"></i>
+                        <h5 class="card-title mt-2">Clientes</h5>
+                        <p class="card-text">Listagem de Clientes</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+
+        <!-- Propostas -->
+        <div class="col-md-4">
+            <a href="#" class="text-decoration-none text-dark">
+                <div class="card shadow-sm p-3">
+                    <div class="card-body">
+                        <i class="bi bi-file-earmark-text fs-1 text-success"></i>
+                        <h5 class="card-title mt-2">Propostas</h5>
+                        <p class="card-text">Listagem de propostas</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+
+        <!-- Mapa -->
+        <div class="col-md-4">
+            <a href="#" class="text-decoration-none text-dark">
+                <div class="card shadow-sm p-3">
+                    <div class="card-body">
+                        <i class="bi bi-map fs-1 text-danger"></i>
+                        <h5 class="card-title mt-2">Mapa</h5>
+                        <p class="card-text">Visualização do mapa em geral</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+
+        <!-- Obras -->
+        <div class="col-md-4 mt-4">
+            <a href="{% url 'cadastro_obras' %}" class="text-decoration-none text-dark">
+                <div class="card shadow-sm p-3">
+                    <div class="card-body">
+                        <i class="bi bi-building fs-1 text-warning"></i>
+                        <h5 class="card-title mt-2">Obras</h5>
+                        <p class="card-text">Listagem de Obras cadastradas</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+
+        <!-- Contatos -->
+        <div class="col-md-4 mt-4">
+            <a href="{% url 'cadastro_contatos' %}" class="text-decoration-none text-dark">
+                <div class="card shadow-sm p-3">
+                    <div class="card-body">
+                        <i class="bi bi-person-lines-fill fs-1 text-success me-2"></i>
+                        <h5 class="card-title mt-2">Contatos</h5>
+                        <p class="card-text">Listagem de Contatos</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+    </div>
+</div>
+
+
+{% endblock %}

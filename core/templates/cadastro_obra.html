@@ -1,0 +1,145 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2>Cadastro de Obras</h2>
+    <div class="card p-4 shadow-sm">
+        <form method="POST" id="obraForm">
+            {% csrf_token %}
+            <input type="hidden" id="id_obra_id" name="obra_id">
+
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Nome da Obra</label>
+                    {{ form.nome_obra }}
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Localização / Endereço</label>
+                    {{ form.localizacao }}
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-4 mb-3">
+                    <label class="form-label">Cidade</label>
+                    {{ form.cidade }}
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label class="form-label">Estado</label>
+                    {{ form.estado }}
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label class="form-label">Responsável</label>
+                    <div class="input-group">
+                        <input type="text" class="form-control" id="buscarResponsavel" placeholder="Buscar responsável...">
+                        <button type="button" class="btn btn-outline-secondary" onclick="abrirModalResponsavel()">Buscar</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-4 mb-3">
+                    <button type="button" class="btn btn-success w-100">Contato</button>
+                </div>
+            </div>
+
+            <div class="d-flex gap-2 justify-content-end mt-3">
+                <button type="submit" class="btn btn-primary" onclick="setSuccessFlag()">Salvar</button>
+                <button type="button" class="btn btn-secondary" onclick="window.location.href='/'">Cancelar</button>
+            </div>
+
+        </form>
+    </div>
+
+    <!-- campo de buscar obra  -->
+  
+
+    <h3 class="mt-4">Obras Cadastradas</h3>
+
+    <form method="GET" id="formBuscaObra">
+        <div class="input-group mb-3">
+            <input type="text" class="form-control" name="q" value="{{ query }}" placeholder="Buscar obra por nome, cidade, estado...">
+            <button class="btn btn-primary" type="submit">🔍</button>
+        </div>
+    </form>   
+
+        <div class="table-responsive">
+            <table class="table table-striped table-hover">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Nome</th>
+                        <th>Endereço</th>
+                        <th>Cidade</th>
+                        <th>Estado</th>
+                        <th class="text-center">Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for obra in obras %}
+                    <tr>
+                        <td>{{ obra.nome_obra }}</td>
+                        <td>{{ obra.localizacao }}</td>
+                        <td>{{ obra.cidade }}</td>
+                        <td>{{ obra.estado }}</td>
+
+                        <td class="text-center">
+                            <button class="btn btn-warning btn-sm" onclick="abrirModalEdicaoObra('{{ obra.id }}', '{{ obra.nome_obra }}', '{{ obra.localizacao }}', '{{ obra.cidade }}', '{{ obra.estado }}')">Editar</button>
+                            <button class="btn btn-danger btn-sm" onclick="abrirModalExclusaoObra('{{ obra.id }}')">Excluir</button>
+                        </td>
+        
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="5" class="text-center">Nenhuma obra cadastrada.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+</div>
+
+
+{% block scripts %}
+
+<!-- Script para editar e excluir obra  -->
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        let obraParaEditar = {};
+    
+        // Torna a função global para ser usada no botão
+        window.abrirModalEdicaoObra = function (id, nome, localizacao, cidade, estado) {
+            obraParaEditar = { id, nome, localizacao, cidade, estado };
+    
+            const modal = new bootstrap.Modal(document.getElementById('modalConfirmarEdicaoObra'));
+            modal.show();
+        };
+    
+        // Quando clicar em "Sim, editar" no modal
+        const btnConfirmar = document.getElementById('confirmarEdicaoObraBtn');
+        if (btnConfirmar) {
+            btnConfirmar.addEventListener('click', function () {
+                document.getElementById('id_obra_id').value = obraParaEditar.id;
+                document.getElementById('id_nome_obra').value = obraParaEditar.nome;
+                document.getElementById('id_localizacao').value = obraParaEditar.localizacao;
+                document.getElementById('id_cidade').value = obraParaEditar.cidade;
+                document.getElementById('id_estado').value = obraParaEditar.estado;
+    
+                bootstrap.Modal.getInstance(document.getElementById('modalConfirmarEdicaoObra')).hide();
+            });
+        }
+    
+        // Função de exclusão
+        window.abrirModalExclusaoObra = function (id) {
+            const form = document.getElementById('formExcluirObra');
+            form.action = `/excluir_obra/${id}/`;
+            const modal = new bootstrap.Modal(document.getElementById('modalConfirmarExclusaoObra'));
+            modal.show();
+        };
+    });
+</script>
+    
+  
+{% endblock %}
+
+
+{% endblock %}

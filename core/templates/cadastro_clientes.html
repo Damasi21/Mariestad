@@ -1,0 +1,218 @@
+{% extends "base.html" %}
+
+{% block title %}Cadastro de Clientes - Apolux{% endblock %}
+
+{% block content %}
+
+<div class="container mt-5">
+    <div class="card shadow-lg p-4">
+        <h3 class="text-center mb-4">Cadastro de Clientes</h3>
+        <form>
+                
+            <div class="row g-3 align-items-end">
+                <!-- Campo CNPJ e Botão Pesquisar -->
+                <div class="col-md-4">
+                    <label for="cnpj" class="form-label">CNPJ / CPF</label>
+                    <div class="input-group">
+                        <input type="text" class="form-control" id="cnpj" placeholder="Digite o CNPJ ou CPF">
+                        <button type="button" class="btn btn-primary" placeholder="00.000.000/0000-00" id="btn-pesquisar">Pesquisar</button>
+                    </div>
+                </div>
+
+                <!-- Botão Contatos mais centralizado -->
+                <div class="col-md-4 d-flex justify-content-start align-items-end">
+                    <button type="button" class="btn btn-info" data-bs-toggle="modal" data-bs-target="#contatosModal">
+                        Contatos
+                    </button>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Razão Social</label>
+                    <input type="text" class="form-control" placeholder="Digite a Razão Social" id="razao_social">
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Nome Fantasia</label>
+                    <input type="text" class="form-control" placeholder="Digite o Nome Fantasia" id="fantasia">
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Endereço</label>
+                    <input type="text" class="form-control" placeholder="Digite aqui o endereço" id="endereco">
+                </div>
+                <div class="col-md-2 mb-3">
+                    <label class="form-label">Número</label>
+                    <input type="text" class="form-control" placeholder="Número" id="numero">
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label class="form-label">Complemento</label>
+                    <input type="text" class="form-control" placeholder="Apto, Bloco, etc" id="complemento">
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-4 mb-3">
+                    <label class="form-label">Bairro</label>
+                    <input type="text" class="form-control" placeholder="Digite o Bairro" id="bairro">
+                </div>
+                <div class="col-md-3 mb-3">
+                    <label class="form-label">CEP</label>
+                    <input type="text" class="form-control" placeholder="00000-000" id="cep">
+                </div>
+                <div class="col-md-3 mb-3">
+                    <label class="form-label">Cidade</label>
+                    <input type="text" class="form-control" placeholder="Digite a Cidade" id="cidade">
+                </div>
+                <div class="col-md-2 mb-3">
+                    <label class="form-label">Estado</label>
+                    <select class="form-select" id="uf">
+                        <option selected>Selecione</option>
+                        <option>AC</option>
+                        <option>AM</option>
+                        <option>RR</option>
+                        <option>PA</option>
+                        <option>AP</option>
+                        <option>RO</option>
+                        <option>TO</option>
+                        <option>MA</option>
+                        <option>PI</option>
+                        <option>CE</option>
+                        <option>RN</option>
+                        <option>PB</option>
+                        <option>PE</option>
+                        <option>AL</option>
+                        <option>SE</option>
+                        <option>BA</option>
+                        <option>MG</option>
+                        <option>ES</option>
+                        <option>RJ</option>
+                        <option>SP</option>
+                        <option>PR</option>
+                        <option>SC</option>
+                        <option>RS</option>
+                        <option>MS</option>
+                        <option>MT</option>
+                        <option>GO</option>
+                        <option>DF</option>
+                        <option>Outros</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">E-mail</label>
+                    <input type="email" class="form-control" placeholder="Digite o E-mail" id="email">
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Telefone</label>
+                    <input type="text" class="form-control" placeholder="(00) 00000-0000" id="telefone">
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Observações</label>
+                <textarea class="form-control" rows="3"></textarea>
+            </div>
+
+            <!-- Botões -->
+            <div class="d-flex justify-content-end gap-2">
+                <button type="submit" class="btn btn-success">Salvar</button>
+                <button type="button" class="btn btn-secondary">Cancelar</button>
+                <button type="button" class="btn btn-warning">Editar</button>
+                <button type="button" class="btn btn-danger">Excluir</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Modal de Contatos -->
+<div class="modal fade" id="contatosModal" tabindex="-1" aria-labelledby="contatosModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="contatosModalLabel">Cadastro de Contatos</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <div class="mb-3">
+                        <label for="nome_contato" class="form-label">Nome do Contato</label>
+                        <input type="text" class="form-control" id="nome_contato">
+                    </div>
+                    <div class="mb-3">
+                        <label for="email_contato" class="form-label">E-mail</label>
+                        <input type="email" class="form-control" id="email_contato">
+                    </div>
+                    <div class="mb-3">
+                        <label for="telefone1" class="form-label">Telefone 1</label>
+                        <input type="text" class="form-control" id="telefone1">
+                    </div>
+                    <div class="mb-3">
+                        <label for="telefone2" class="form-label">Telefone 2</label>
+                        <input type="text" class="form-control" id="telefone2">
+                    </div>
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-primary">Salvar</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="button" class="btn btn-warning">Editar</button>
+                        <button type="button" class="btn btn-danger">Excluir</button>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <h6 class="text-muted">Lista de Contatos</h6>
+                <ul class="list-group">
+                    <li class="list-group-item">Contato 1 - contato1@email.com - (11) 99999-9999</li>
+                    <li class="list-group-item">Contato 2 - contato2@email.com - (21) 98888-8888</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        document.getElementById("btn-pesquisar").addEventListener("click", function () {
+            let cnpj = document.getElementById("cnpj").value.replace(/\D/g, ''); // Remove caracteres não numéricos
+    
+            if (cnpj.length !== 14) {
+                alert("CNPJ inválido! Insira um CNPJ com 14 dígitos.");
+                return;
+            }
+    
+            fetch(`/buscar_dados_empresa/?cnpj=${cnpj}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        alert("Erro ao buscar CNPJ: " + data.error);
+                    } else {
+                        // Preenchendo os campos automaticamente
+                        document.getElementById("razao_social").value = data.nome || "";
+                        document.getElementById("fantasia").value = data.fantasia || "";
+                        document.getElementById("endereco").value = data.logradouro || "";
+                        document.getElementById("numero").value = data.numero || "";
+                        document.getElementById("complemento").value = data.complemento || "";
+                        document.getElementById("bairro").value = data.bairro || "";
+                        document.getElementById("cep").value = data.cep || "";
+                        document.getElementById("cidade").value = data.municipio || "";
+                        document.getElementById("uf").value = data.uf || "";
+                        document.getElementById("email").value = data.email || "";
+                        document.getElementById("telefone").value = data.telefone || "";
+                    }
+                })
+                .catch(error => {
+                    console.error("Erro na requisição:", error);
+                    alert("Erro ao buscar os dados da empresa.");
+                });
+        });
+    });
+</script>
+    
+    
+
+{% endblock %}

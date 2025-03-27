@@ -1,0 +1,201 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2>Cadastro de Tags</h2>
+    <div class="card p-4 shadow-sm">
+        <form id="tagForm">  <!-- Corrigido id do formulário -->
+            <div class="mb-3">
+                <label for="nome_tag" class="form-label">Tag</label>
+                <input type="text" class="form-control" id="nome_tag" name="nome_tag" placeholder="Digite a Tag" required>
+            </div>
+            <div class="d-flex gap-2">
+                <button type="submit" class="btn btn-primary">Salvar</button>
+                <button type="button" class="btn btn-secondary" onclick="window.location.href='/'">Cancelar</button>
+            </div>
+        </form>
+    </div>
+
+    <h3 class="mt-4">Tags Cadastradas</h3>
+
+    <!-- Campo de busca com ícone de lupa -->
+    <div class="input-group mb-3">
+        <input type="text" class="form-control" id="inputBuscaTags" name="q" value="{{ query }}" placeholder="Buscar Tag...">
+        <button class="btn btn-primary" id="botaoBuscarTags">
+            🔍
+        </button>
+    </div>
+
+    <ul class="list-group" id="listaTags">
+        {% for tag in tags %}
+        <li class="list-group-item d-flex justify-content-between align-items-center tag-item" id="tag-{{ tag.id }}">
+            <span class="tag-text">{{ tag.nome_tag }}</span>
+                <div>
+                    <button class="btn btn-warning btn-sm" onclick="editarTag('{{ tag.id }}')">Editar</button>  <!-- Corrigido função -->
+                    <button class="btn btn-danger btn-sm" onclick="excluirTag('{{ tag.id }}')">Excluir</button>  <!-- Corrigido função -->
+                </div>
+            </li>
+        {% endfor %}
+    </ul>
+</div>
+
+
+{% block scripts %}
+<script>
+    $(document).ready(function () {
+
+    // ==========================
+    // SALVAR TAGS
+    // ==========================
+    $("#tagForm").off("submit").on("submit", function (event) {
+        event.preventDefault();
+        
+        let nome_tag = $("#nome_tag").val().trim();
+
+        if (nome_tag === "") {
+            exibirNotificacao("O nome da Tag não pode estar vazio!", "error");
+            return;
+        }
+
+        $.ajax({
+            type: "POST",
+            url: "{% url 'salvar_tags' %}",
+            data: {
+                nome_tag: nome_tag,
+                csrfmiddlewaretoken: "{{ csrf_token }}"
+            },
+            success: function (response) {
+                    if (response.tags) {
+                        $("#listaTags").empty(); // Limpa a lista antes de atualizar
+                        response.tags.forEach(function (tag) {
+                            $("#listaTags").append(`
+                                <li class="list-group-item d-flex justify-content-between align-items-center" id="tag-${tag.id}">
+                                    <span id="tag-text-${tag.id}">${tag.nome_tag}</span>
+                                    <div>
+                                        <button class="btn btn-warning btn-sm" onclick="editarTag(${tag.id})">Editar</button>
+                                        <button class="btn btn-danger btn-sm" onclick="excluirTag(${tag.id})">Excluir</button>
+                                    </div>
+                                </li>
+                            `);
+                        });
+
+                    $("#nome_tag").val("");
+                    exibirNotificacao("Tag salva com sucesso!", "success");
+                } else {
+                    exibirNotificacao("Erro ao salvar Tag.", "error");
+                }
+            },
+            error: function (xhr) {
+                    if (xhr.status === 400) {
+                        exibirNotificacao(xhr.responseJSON.error, "error");
+                    } else {
+                        exibirNotificacao("Erro ao salvar tag.", "error");
+                    }
+                }
+        });
+    });
+
+    // ==========================
+    // EDITAR TAGS - Com modal
+    // ==========================
+    window.editarTag = function (id) {
+        let tagNomeAtual = $(`#tag-text-${id}`).text();
+        $("#edit-tag-id").val(id);
+        $("#edit-tag-name").val(tagNomeAtual);
+        $("#modalEditarTag").modal("show");
+    };
+
+    $("#salvarEdicaoTag").off("click").on("click", function () {
+        let id = $("#edit-tag-id").val();
+        let novoNome = $("#edit-tag-name").val().trim();
+
+        if (novoNome === "") {
+            alert("O nome da tag não pode estar vazio!");
+            return;
+        }
+
+        $.ajax({
+            type: "POST",
+            url: `/editar_tags/${id}/`,
+            data: {
+                nome_tag: novoNome,
+                csrfmiddlewaretoken: "{{ csrf_token }}"
+            },
+            success: function (response) {
+                   if (response.success) {
+                    $(`#tag-text-${id}`).text(response.nome_tag);
+                    $("#modalEditarTag").modal("hide");
+                    exibirNotificacao("Tag atualizada com sucesso!", "success");
+                } else {
+                    exibirNotificacao("Erro ao editar tag.", "error");
+                }
+            },
+            error: function () {
+                    exibirNotificacao("Erro ao editar tag.", "error");
+                }
+        });
+    });
+
+    // ==========================
+    // EXCLUIR TAGS - Com modal
+    // ==========================
+    window.excluirTag = function (id) {
+        $("#delete-tag-id").val(id);
+        $("#modalExcluirTag").modal("show");
+    };
+
+    $("#confirmarExclusaoTag").off("click").on("click", function () {
+        let id = $("#delete-tag-id").val();
+
+        $.ajax({
+            type: "POST",
+            url: `/excluir_tags/${id}/`,
+            data: {
+                csrfmiddlewaretoken: "{{ csrf_token }}"
+            },
+            success: function (response) {
+                if (response.success) {
+                    $(`#tag-${id}`).remove();
+                    $("#modalExcluirTag").modal("hide");
+                    exibirNotificacao("Tag excluída com sucesso!", "success");
+                } else {
+                    exibirNotificacao("Erro ao excluir tag.", "error");
+                }
+            },
+            error: function (xhr) {
+                exibirNotificacao("Erro ao excluir tag.", "error");
+            }
+        });
+    });
+
+    // ==========================
+    // FUNÇÃO DE NOTIFICAÇÃO
+    // ==========================
+    function exibirNotificacao(mensagem, tipo = "success") {
+        $("#modalNotificacaoMensagem").html(mensagem);
+
+        if (tipo === "success") {
+            $("#modalNotificacao .modal-content").addClass("border-success");
+            $("#modalNotificacaoLabel").text("Sucesso!");
+        } else {
+            $("#modalNotificacao .modal-content").addClass("border-danger");
+            $("#modalNotificacaoLabel").text("Erro!");
+        }
+
+        $("#modalNotificacao").modal("show");
+
+        setTimeout(function () {
+            $("#modalNotificacao").modal("hide");
+            $("#modalNotificacao .modal-content").removeClass("border-success border-danger");
+        }, 1500);
+    }
+});
+
+</script>
+
+{% endblock %}
+
+{% endblock %}
+
+
+

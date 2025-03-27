@@ -1,0 +1,115 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2>Cadastro de Produto</h2>
+    <div class="card p-4 shadow-sm">
+        <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            
+            <!-- Campo oculto para armazenar o ID do produto -->
+            <input type="hidden" id="id_produto_id" name="produto_id">
+            <div class="row">
+                <div class="col-md-4 text-center">
+                    <label class="form-label">Foto do Produto</label>
+                        <div class="border rounded d-flex align-items-center justify-content-center p-2 mb-2" style="width: 100%; height: 280px; background-color: #f8f9fa;">
+                            <img id="previewImage" src="https://via.placeholder.com/150x200" class="img-fluid rounded" style="max-height: 100%;" alt="Prévia do Produto">
+                        </div>
+                        {{ form.foto }}
+                </div>
+                
+                <div class="col-md-8">
+                    <div class="mb-3">
+                        <label class="form-label">Código</label>
+                        {{ form.codigo }}
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Descrição</label>
+                        {{ form.descricao }}
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">NCM</label>
+                            {{ form.ncm }}
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">Unidade</label>
+                            {{ form.unidade }}
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">Preço</label>
+                            {{ form.preco }}
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Observações</label>
+                        {{ form.observacoes }}
+                    </div>
+                    <div class="d-flex gap-2 justify-content-end mt-3">
+                        <button type="submit" class="btn btn-primary" onclick="setSuccessFlag()">Salvar</button>
+                        <button type="button" class="btn btn-secondary" onclick="window.location.href='/'">Cancelar</button>
+                    </div>
+                </div>
+                
+            </div>
+        </form>        
+    </div>
+
+    <!-- listagem de produtos -->
+    <h3 class="mt-4">Produtos Cadastrados</h3>
+
+        <div class="input-group mb-3">
+            <input type="text" class="form-control" id="inputBuscaProduto" name="q" value="{{ query }}" placeholder="Buscar Produto...">
+            <button class="btn btn-primary" id="botaoBuscarProduto">
+                🔍
+            </button>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table table-striped table-hover">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Código</th>
+                        <th>Descrição</th>
+                        <th>Preço</th>
+                        <th class="text-center">Ações</th>
+                    </tr>
+            
+                </thead>
+                <tbody>
+                    {% for produto in produtos %}
+                    <tr>
+                        <td>{{ produto.codigo }}</td>
+                        <td>{{ produto.descricao }}</td>
+                        <td>R$ {{ produto.preco }}</td>
+                        <td class="text-center">
+                            <button class="btn btn-info btn-sm">Visualizar</button>
+                            <button class="btn btn-warning btn-sm" onclick="confirmarEdicao('{{ produto.id }}', '{{ produto.codigo }}', '{{ produto.descricao }}', '{{ produto.ncm }}', '{{ produto.unidade }}', '{{ produto.preco }}', '{{ produto.observacoes }}')">Editar</button>
+                            <button class="btn btn-danger btn-sm" onclick="confirmarExclusao('{{ produto.id }}')">Excluir</button>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="4" class="text-center">Nenhum produto cadastrado.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    
+
+
+<!-- Script para pré-visualizar a imagem -->
+<script>
+    document.getElementById('id_foto').addEventListener('change', function(event) {
+        const file = event.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                document.getElementById('previewImage').src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+</script>
+{% endblock %}
