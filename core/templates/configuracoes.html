@@ -1,0 +1,145 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-5"
+     data-status-salvo="{{ status_salvo|yesno:'true,false' }}"
+     data-tag-salvo="{{ tag_salvo|yesno:'true,false' }}"
+     data-status-cliente-salvo="{{ status_cliente|yesno:'true,false' }}">
+</div>
+
+  <h2>Configurações</h2>
+
+<div class="row">
+    <!-- Status -->
+    <div class="col-md-6">
+      <div class="card mb-4 p-3">
+        <h4>Status de Obras</h4>
+        <form method="POST">
+          {% csrf_token %}
+          <input type="hidden" name="status_id" id="id_status_id">
+          {{ status_form.nome.label_tag }}{{ status_form.nome }}
+          <button type="button" class="btn btn-primary mt-2 mb-3" onclick="confirmarSalvarStatus()">Salvar</button>
+        </form>
+
+        <div class="input-group mb-2">
+            <span class="input-group-text"><i class="bi bi-search"></i></span>
+            <input type="text" class="form-control" placeholder="Buscar..." onkeyup="filtrarTabela(this)">
+        </div>
+
+        <table class="table mt-4">
+          <thead><tr><th>Nome</th><th>Ações</th></tr></thead>
+          <tbody>
+            {% for status in status_list %}
+            <tr>
+              <td>{{ status.nome }}</td>
+              <td>
+                <button class="btn btn-warning btn-sm"
+                        data-id="{{ status.id }}"
+                        data-nome="{{ status.nome }}"
+                        onclick="editarStatus(this)">Editar</button>
+                <button class="btn btn-danger btn-sm"
+                        onclick="confirmarExclusaoStatus('{{ status.id }}')">Excluir</button>
+              </td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="2">Nenhum status cadastrado</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Tags -->
+    <div class="col-md-6">
+      <div class="card mb-4 p-3">
+        <h4>Tags</h4>
+        <form method="POST">
+          {% csrf_token %}
+          <input type="hidden" name="tag_id" id="id_tag_id">
+          {{ tag_form.nome.label_tag }}{{ tag_form.nome }}
+          <button type="button" class="btn btn-primary mt-2 mb-3" onclick="confirmarSalvarTag()">Salvar</button>
+        </form>
+
+        <div class="input-group mb-2">
+            <span class="input-group-text"><i class="bi bi-search"></i></span>
+            <input type="text" class="form-control" placeholder="Buscar..." onkeyup="filtrarTabela(this)">
+        </div>
+          
+
+        <table class="table mt-4">
+          <thead><tr><th>Nome</th><th>Ações</th></tr></thead>
+          <tbody>
+            {% for tag in tag_list %}
+            <tr>
+              <td>{{ tag.nome }}</td>
+              <td>
+                <button class="btn btn-warning btn-sm"
+                        data-id="{{ tag.id }}"
+                        data-nome="{{ tag.nome }}"
+                        onclick="editarTag(this)">Editar</button>
+                <button class="btn btn-danger btn-sm"
+                        onclick="confirmarExclusaoTag('{{ tag.id }}')">Excluir</button>
+              </td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="2">Nenhuma tag cadastrada</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+ 
+
+    <!-- Status de Cliente -->
+    <div class="col-md-6">
+      <div class="card mb-4 p-3">
+        <h4>Status de Cliente</h4>
+        <form method="POST" id="form_status_cliente">
+          {% csrf_token %}
+          <input type="hidden" name="status_cliente_id" id="id_status_cliente_id">
+          <label for="id_nome_cliente">Nome</label>
+          <input type="text" name="nome" id="id_nome_cliente" class="form-control">
+          <button type="button" class="btn btn-primary mt-2 mb-3" onclick="confirmarSalvarStatusCliente()">Salvar</button>
+        </form>
+
+        <div class="input-group mb-2">
+            <span class="input-group-text"><i class="bi bi-search"></i></span>
+            <input type="text" class="form-control" placeholder="Buscar..." onkeyup="filtrarTabela(this)">
+        </div>
+
+        <table class="table mt-4">
+          <thead><tr><th>Nome</th><th>Ações</th></tr></thead>
+          <tbody>
+            {% for status_cliente in status_cliente_list %}
+            <tr>
+              <td>{{ status_cliente.nome }}</td>
+              <td>
+                <button class="btn btn-warning btn-sm"
+                        data-id="{{ status_cliente.id }}"
+                        data-nome="{{ status_cliente.nome }}"
+                        onclick="editarStatusCliente(this)">Editar</button>
+                <button class="btn btn-danger btn-sm"
+                        onclick="confirmarExclusaoStatusCliente('{{ status_cliente.id }}')">Excluir</button>
+              </td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="2">Nenhum status de cliente cadastrado</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+
+    <!-- Botão Voltar -->
+  <div class="mt-4">
+    <a href="{% url 'index' %}" class="btn btn-secondary">Voltar</a>
+  </div>
+
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{% static 'js/configuracoes.js' %}"></script>
+{% endblock %}

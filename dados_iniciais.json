@@ -1,0 +1,48 @@
+[
+    {
+        "model": "core.produto",
+        "pk": 1,
+        "fields": {
+            "codigo": "P001",
+            "descricao": "Macro4Max - Macrofibra sintética para concreto",
+            "unidade": "Unidade",
+            "preco": "250.00",
+            "ncm": "39021010",
+            "observacoes": "Produto de alto desempenho para reforço de pisos industriais.",
+            "foto": null
+        }
+    },
+    {
+        "model": "core.produto",
+        "pk": 2,
+        "fields": {
+            "codigo": "P002",
+            "descricao": "Cura4Max - Agente de cura química para concreto",
+            "unidade": "Litro",
+            "preco": "15.50",
+            "ncm": "38244000",
+            "observacoes": "Aplicação com bomba costal. Rendimento: 10m² por litro.",
+            "foto": null
+        }
+    },
+    {
+        "model": "core.obra",
+        "pk": 1,
+        "fields": {
+            "nome_obra": "Galpão Logístico SP-01",
+            "localizacao": "Rodovia Anhanguera, KM 32",
+            "cidade": "Campinas",
+            "estado": "SP"
+        }
+    },
+    {
+        "model": "core.obra",
+        "pk": 2,
+        "fields": {
+            "nome_obra": "Pátio de Concreto Porto Sul",
+            "localizacao": "Avenida Portuária, 5400",
+            "cidade": "Salvador",
+            "estado": "BA"
+        }
+    }
+]

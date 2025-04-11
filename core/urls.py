@@ -4,32 +4,32 @@ from . import views  # Importa as views
 
 urlpatterns = [
     path('', views.index, name='index'),  # Página inicial
-    path('cadastro_clientes/', views.cadastro_clientes, name='cadastro_clientes'),  # Página de cadastro de clientes
-    path('cadastro_tags/', views.cadastro_tags, name='cadastro_tags'),
-    path('cadastro_status/', views.cadastro_status, name='cadastro_status'),
-    path('cadastro_obras/', views.cadastro_obras, name='cadastro_obras'),
-    path('cadastro_contatos/', views.cadastro_contatos, name='cadastro_contatos'),
+      # Página de cadastro de clientes
+    
+
+    path('produtos/', views.cadastro_produto, name='cadastro_produto'),
+    path('produtos/excluir/<int:id>/', views.excluir_produto, name='excluir_produto'),
+    
+    path('configuracoes/', views.configuracoes, name='configuracoes'),
+    path('status-obra/excluir/<int:id>/', views.excluir_status, name='excluir_status'),
+    path('tags/excluir/<int:id>/', views.excluir_tag, name='excluir_tag'),
+    path('status-cliente/excluir/<int:id>/', views.excluir_status_cliente, name='excluir_status_cliente'),
 
 
-    path('salvar_status/', views.salvar_status, name='salvar_status'),  # Adicione esta linha
-    path("editar_status/<int:id>/", views.editar_status, name="editar_status"),
-    path("excluir_status/<int:id>/", views.excluir_status, name="excluir_status"),
+    path('contatos/', views.cadastro_contatos, name='cadastro_contatos'),
+    path('contatos/excluir/<int:id>/', views.excluir_contato, name='excluir_contato'),
 
-    path('salvar_tags/', views.salvar_tags, name='salvar_tags'),  # Adicione esta linha
-    path("editar_tags/<int:id>/", views.editar_tags, name="editar_tags"),
-    path("excluir_tags/<int:id>/", views.excluir_tags, name="excluir_tags"),
-
-    path('cadastro_produto/', views.cadastro_produto, name='cadastro_produto'),
-    path('excluir_produto/<int:produto_id>/', views.excluir_produto, name='excluir_produto'),
-
-    path('excluir_obra/<int:id>/', views.excluir_obra, name='excluir_obra'),
-
-    path('editar_contato/<int:id>/', views.editar_contato, name='editar_contato'),
-    path('excluir_contato/<int:id>/', views.excluir_contato, name='excluir_contato'),
+    path('obras/', views.cadastro_obras, name='cadastro_obras'),
+    path('obras/excluir/<int:id>/', views.excluir_obra, name='excluir_obra'),
+    path('obras/anexar/', views.anexar_arquivos, name='anexar_arquivos'),
+    path('obras/listar-anexos/<int:obra_id>/', views.listar_anexos, name='listar_anexos'),
+    path('obras/excluir-anexo/', views.excluir_anexo, name='excluir_anexo'),
 
 
 
-    path('buscar_dados_empresa/', views.buscar_dados_empresa, name='buscar_dados_empresa'),
+
+
 ]
+
 
     

@@ -1,218 +1,272 @@
 {% extends "base.html" %}
-
-{% block title %}Cadastro de Clientes - Apolux{% endblock %}
-
+{% load static %}
 {% block content %}
 
-<div class="container mt-5">
-    <div class="card shadow-lg p-4">
-        <h3 class="text-center mb-4">Cadastro de Clientes</h3>
-        <form>
-                
-            <div class="row g-3 align-items-end">
-                <!-- Campo CNPJ e Botão Pesquisar -->
-                <div class="col-md-4">
-                    <label for="cnpj" class="form-label">CNPJ / CPF</label>
-                    <div class="input-group">
-                        <input type="text" class="form-control" id="cnpj" placeholder="Digite o CNPJ ou CPF">
-                        <button type="button" class="btn btn-primary" placeholder="00.000.000/0000-00" id="btn-pesquisar">Pesquisar</button>
-                    </div>
-                </div>
 
-                <!-- Botão Contatos mais centralizado -->
-                <div class="col-md-4 d-flex justify-content-start align-items-end">
-                    <button type="button" class="btn btn-info" data-bs-toggle="modal" data-bs-target="#contatosModal">
-                        Contatos
-                    </button>
-                </div>
-            </div>
+<div class="container mt-4">
+  <h2>Cadastro de Clientes</h2>
 
-            <div class="row">
-                <div class="col-md-6 mb-3">
-                    <label class="form-label">Razão Social</label>
-                    <input type="text" class="form-control" placeholder="Digite a Razão Social" id="razao_social">
-                </div>
+  <!-- Abas -->
+  <ul class="nav nav-tabs" id="clienteTabs" role="tablist">
+    <li class="nav-item">
+      <button class="nav-link active" id="form-tab" data-bs-toggle="tab" data-bs-target="#formCliente" type="button" role="tab">Formulário</button>
+    </li>
+    <li class="nav-item">
+      <button class="nav-link" id="lista-tab" data-bs-toggle="tab" data-bs-target="#listaClientes" type="button" role="tab">Listagem</button>
+    </li>
+  </ul>
 
-                <div class="col-md-6 mb-3">
-                    <label class="form-label">Nome Fantasia</label>
-                    <input type="text" class="form-control" placeholder="Digite o Nome Fantasia" id="fantasia">
-                </div>
-            </div>
+  <div class="tab-content border border-top-0 p-3" id="clienteTabsContent">
+    <!-- FORMULÁRIO -->
+    <div class="tab-pane fade show active" id="formCliente" role="tabpanel">
+      <form method="POST" id="clienteForm">
+        {% csrf_token %}
+        <input type="hidden" name="cliente_id" id="id_cliente_id">
 
-            <div class="row">
-                <div class="col-md-6 mb-3">
-                    <label class="form-label">Endereço</label>
-                    <input type="text" class="form-control" placeholder="Digite aqui o endereço" id="endereco">
-                </div>
-                <div class="col-md-2 mb-3">
-                    <label class="form-label">Número</label>
-                    <input type="text" class="form-control" placeholder="Número" id="numero">
-                </div>
-                <div class="col-md-4 mb-3">
-                    <label class="form-label">Complemento</label>
-                    <input type="text" class="form-control" placeholder="Apto, Bloco, etc" id="complemento">
-                </div>
-            </div>
-
-            <div class="row">
-                <div class="col-md-4 mb-3">
-                    <label class="form-label">Bairro</label>
-                    <input type="text" class="form-control" placeholder="Digite o Bairro" id="bairro">
-                </div>
-                <div class="col-md-3 mb-3">
-                    <label class="form-label">CEP</label>
-                    <input type="text" class="form-control" placeholder="00000-000" id="cep">
-                </div>
-                <div class="col-md-3 mb-3">
-                    <label class="form-label">Cidade</label>
-                    <input type="text" class="form-control" placeholder="Digite a Cidade" id="cidade">
-                </div>
-                <div class="col-md-2 mb-3">
-                    <label class="form-label">Estado</label>
-                    <select class="form-select" id="uf">
-                        <option selected>Selecione</option>
-                        <option>AC</option>
-                        <option>AM</option>
-                        <option>RR</option>
-                        <option>PA</option>
-                        <option>AP</option>
-                        <option>RO</option>
-                        <option>TO</option>
-                        <option>MA</option>
-                        <option>PI</option>
-                        <option>CE</option>
-                        <option>RN</option>
-                        <option>PB</option>
-                        <option>PE</option>
-                        <option>AL</option>
-                        <option>SE</option>
-                        <option>BA</option>
-                        <option>MG</option>
-                        <option>ES</option>
-                        <option>RJ</option>
-                        <option>SP</option>
-                        <option>PR</option>
-                        <option>SC</option>
-                        <option>RS</option>
-                        <option>MS</option>
-                        <option>MT</option>
-                        <option>GO</option>
-                        <option>DF</option>
-                        <option>Outros</option>
-                    </select>
-                </div>
-            </div>
-
-            <div class="row">
-                <div class="col-md-6 mb-3">
-                    <label class="form-label">E-mail</label>
-                    <input type="email" class="form-control" placeholder="Digite o E-mail" id="email">
-                </div>
-                <div class="col-md-6 mb-3">
-                    <label class="form-label">Telefone</label>
-                    <input type="text" class="form-control" placeholder="(00) 00000-0000" id="telefone">
-                </div>
-            </div>
-
-            <div class="mb-3">
-                <label class="form-label">Observações</label>
-                <textarea class="form-control" rows="3"></textarea>
-            </div>
-
-            <!-- Botões -->
-            <div class="d-flex justify-content-end gap-2">
-                <button type="submit" class="btn btn-success">Salvar</button>
-                <button type="button" class="btn btn-secondary">Cancelar</button>
-                <button type="button" class="btn btn-warning">Editar</button>
-                <button type="button" class="btn btn-danger">Excluir</button>
-            </div>
-        </form>
-    </div>
-</div>
-
-<!-- Modal de Contatos -->
-<div class="modal fade" id="contatosModal" tabindex="-1" aria-labelledby="contatosModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="contatosModalLabel">Cadastro de Contatos</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <form>
-                    <div class="mb-3">
-                        <label for="nome_contato" class="form-label">Nome do Contato</label>
-                        <input type="text" class="form-control" id="nome_contato">
-                    </div>
-                    <div class="mb-3">
-                        <label for="email_contato" class="form-label">E-mail</label>
-                        <input type="email" class="form-control" id="email_contato">
-                    </div>
-                    <div class="mb-3">
-                        <label for="telefone1" class="form-label">Telefone 1</label>
-                        <input type="text" class="form-control" id="telefone1">
-                    </div>
-                    <div class="mb-3">
-                        <label for="telefone2" class="form-label">Telefone 2</label>
-                        <input type="text" class="form-control" id="telefone2">
-                    </div>
-                    <div class="d-flex gap-2">
-                        <button type="submit" class="btn btn-primary">Salvar</button>
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                        <button type="button" class="btn btn-warning">Editar</button>
-                        <button type="button" class="btn btn-danger">Excluir</button>
-                    </div>
-                </form>
-            </div>
-            <div class="modal-footer">
-                <h6 class="text-muted">Lista de Contatos</h6>
-                <ul class="list-group">
-                    <li class="list-group-item">Contato 1 - contato1@email.com - (11) 99999-9999</li>
-                    <li class="list-group-item">Contato 2 - contato2@email.com - (21) 98888-8888</li>
-                </ul>
-            </div>
+        {% if form.errors %}
+        <div class="alert alert-danger">
+          <strong>Erro ao salvar o cliente:</strong>
+          <ul>
+            {% for field in form %}
+              {% for error in field.errors %}
+                <li><strong>{{ field.label }}:</strong> {{ error }}</li>
+              {% endfor %}
+            {% endfor %}
+          </ul>
         </div>
+          {% endif %}
+            
+          <div class="row align-items-end">
+            <!-- Campo de CNPJ -->
+            <div class="col-md-6 mb-3">
+              <label class="form-label">CNPJ</label>
+              <div class="input-group">
+                {{ form.cnpj }}
+                <button type="button" class="btn btn-sm btn-success" onclick="buscarCNPJ()" style="white-space: nowrap;">🔍 Buscar</button>
+              </div>
+            </div>
+          
+            <!-- Botão Contatos -->
+            <div class="col-md-3 mb-3">
+              <label class="form-label d-block">&nbsp;</label>
+              <a href="#" onclick="abrirContatos()" class="btn btn-sm btn-outline-primary w-100">👤 Contatos</a>
+            </div>
+          
+            <!-- Botão Obras -->
+            <div class="col-md-3 mb-3">
+              <label class="form-label d-block">&nbsp;</label>
+              <a href="#" onclick="abrirObras()" class="btn btn-sm btn-outline-warning w-100">🏗️ Obras</a>
+            </div>
+          </div>
+        
+        <!-- Linha 2: Razão Social e Nome Fantasia -->
+        <div class="row">
+          <div class="col-md-6 mb-3">
+            <label>Razão Social</label>
+            {{ form.razao_social }}
+          </div>
+          <div class="col-md-6 mb-3">
+            <label>Nome Fantasia</label>
+            {{ form.nome_fantasia }}
+          </div>
+        </div>
+
+        <!-- Linha 3: Endereço, Número, Complemento -->
+        <div class="row">
+          <div class="col-md-5 mb-3">
+            <label>Endereço</label>
+            {{ form.endereco }}
+          </div>
+          <div class="col-md-2 mb-3">
+            <label>Número</label>
+            {{ form.numero }}
+          </div>
+          <div class="col-md-5 mb-3">
+            <label>Complemento</label>
+            {{ form.complemento }}
+          </div>
+        </div>
+
+        <!-- Linha 4: Bairro, CEP -->
+        <div class="row">
+          <div class="col-md-6 mb-3">
+            <label>Bairro</label>
+            {{ form.bairro }}
+          </div>
+          <div class="col-md-6 mb-3">
+            <label>CEP</label>
+            {{ form.cep }}
+          </div>
+        </div>
+
+        <!-- Linha 5: Cidade, Estado -->
+        <div class="row">
+          <div class="col-md-8 mb-3">
+            <label>Cidade</label>
+            {{ form.cidade }}
+          </div>
+          <div class="col-md-4 mb-3">
+            <label>Estado</label>
+            {{ form.estado }}
+          </div>
+        </div>
+
+        <!-- Linha 6: Email, Telefone -->
+        <div class="row">
+          <div class="col-md-6 mb-3">
+            <label>Email</label>
+            {{ form.email }}
+          </div>
+          <div class="col-md-6 mb-3">
+            <label>Telefone</label>
+            {{ form.telefone }}
+          </div>
+        </div>
+
+        <!-- Linha 7: Status e Tags -->
+        <div class="row">
+          <div class="col-md-4 mb-3">
+            <label>Status</label>
+            {{ form.status }}
+          </div>
+          <div class="col-md-8 mb-3">
+            <label>Tags</label>
+            {{ form.tags }}
+          </div>
+        </div>
+
+        <!-- Observações -->
+        <div class="mb-3">
+          <label>Observações</label>
+          {{ form.observacoes }}
+        </div>
+
+        <!-- Botões -->
+        <div class="d-flex justify-content-end gap-2">
+            <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#confirmarSalvarCliente">Salvar</button>
+            <a href="{% url 'index' %}" class="btn btn-secondary">Cancelar</a>
+            <button type="button" id="btnExcluirCliente" class="btn btn-danger d-none" data-bs-toggle="modal" data-bs-target="#confirmarExcluirCliente">Excluir</button>
+        </div>
+      </form>
     </div>
+
+    <!-- LISTAGEM -->
+    <div class="tab-pane fade" id="listaClientes" role="tabpanel">
+      <div class="table-responsive">
+        <table class="table table-striped table-hover table-bordered" id="tabelaClientes">
+          <thead class="table-light">
+            <tr>
+              <th>Status<br><input class="form-control form-control-sm filtro" /></th>
+              <th>Tags<br><input class="form-control form-control-sm filtro" /></th>
+              <th>Nome Fantasia<br><input class="form-control form-control-sm filtro" /></th>
+              <th>Razão Social<br><input class="form-control form-control-sm filtro" /></th>
+              <th>Endereço<br><input class="form-control form-control-sm filtro" /></th>
+              <th>Número<br><input class="form-control form-control-sm filtro" /></th>
+              <th>Bairro<br><input class="form-control form-control-sm filtro" /></th>
+              <th>CEP<br><input class="form-control form-control-sm filtro" /></th>
+              <th>Complemento<br><input class="form-control form-control-sm filtro" /></th>
+              <th>Cidade<br><input class="form-control form-control-sm filtro" /></th>
+              <th>Estado<br><input class="form-control form-control-sm filtro" /></th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for cliente in clientes %}
+              <tr ondblclick="carregarCliente('{{ cliente.id }}')">
+                <td>{{ cliente.status }}</td>
+                <td>{% for tag in cliente.tags.all %}<span class="badge bg-secondary">{{ tag }}</span> {% endfor %}</td>
+                <td>{{ cliente.nome_fantasia }}</td>
+                <td>{{ cliente.razao_social }}</td>
+                <td>{{ cliente.endereco }}</td>
+                <td>{{ cliente.numero }}</td>
+                <td>{{ cliente.bairro }}</td>
+                <td>{{ cliente.cep }}</td>
+                <td>{{ cliente.complemento }}</td>
+                <td>{{ cliente.cidade }}</td>
+                <td>{{ cliente.estado }}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
 </div>
+
+{% block scripts %}
+
+<!-- JS para carregar cliente e aplicar filtros -->
 
 <script>
-    document.addEventListener("DOMContentLoaded", function () {
-        document.getElementById("btn-pesquisar").addEventListener("click", function () {
-            let cnpj = document.getElementById("cnpj").value.replace(/\D/g, ''); // Remove caracteres não numéricos
-    
-            if (cnpj.length !== 14) {
-                alert("CNPJ inválido! Insira um CNPJ com 14 dígitos.");
-                return;
-            }
-    
-            fetch(`/buscar_dados_empresa/?cnpj=${cnpj}`)
-                .then(response => response.json())
-                .then(data => {
-                    if (data.error) {
-                        alert("Erro ao buscar CNPJ: " + data.error);
-                    } else {
-                        // Preenchendo os campos automaticamente
-                        document.getElementById("razao_social").value = data.nome || "";
-                        document.getElementById("fantasia").value = data.fantasia || "";
-                        document.getElementById("endereco").value = data.logradouro || "";
-                        document.getElementById("numero").value = data.numero || "";
-                        document.getElementById("complemento").value = data.complemento || "";
-                        document.getElementById("bairro").value = data.bairro || "";
-                        document.getElementById("cep").value = data.cep || "";
-                        document.getElementById("cidade").value = data.municipio || "";
-                        document.getElementById("uf").value = data.uf || "";
-                        document.getElementById("email").value = data.email || "";
-                        document.getElementById("telefone").value = data.telefone || "";
-                    }
-                })
-                .catch(error => {
-                    console.error("Erro na requisição:", error);
-                    alert("Erro ao buscar os dados da empresa.");
-                });
-        });
+   function carregarCliente(id) {
+    fetch(`/editar_cliente/${id}/`)
+    .then(response => response.json())
+    .then(data => {
+      for (const campo in data) {
+        if (campo === "tags") {
+          const select = document.getElementById("id_tags");
+          if (select) {
+            $(select).val(data.tags).trigger("change");
+          }
+        } else if (campo === "status") {
+          const select = document.getElementById("id_status");
+          if (select) select.value = data.status;
+        } else {
+          const input = document.getElementById(`id_${campo}`);
+          if (input) input.value = data[campo];
+        }
+      }
+
+      // Preenche o campo oculto com o ID do cliente
+      document.getElementById("id_cliente_id").value = data.id;
+
+      // Ativa botão de exclusão
+      document.getElementById("btnExcluirCliente").classList.remove("d-none");
+      document.getElementById("formExcluirCliente").action = `/excluir_cliente/${data.id}/`;
+
+      // Abre a aba do formulário
+      document.getElementById("form-tab").click();
     });
+  }
+    
+
+  document.querySelectorAll('.filtro').forEach((input, index) => {
+    input.addEventListener('keyup', function () {
+      const filtro = this.value.toLowerCase();
+      const linhas = document.querySelectorAll("#tabelaClientes tbody tr");
+      linhas.forEach(linha => {
+        const celula = linha.cells[index].innerText.toLowerCase();
+        linha.style.display = celula.includes(filtro) ? "" : "none";
+      });
+    });
+  });
+
 </script>
+
+<!-- JS DOS BOTOES PARA CONTATOS E OBRAS  -->
+
+<script>
+  function abrirContatos() {
+    const clienteId = document.getElementById("id_cliente_id").value;
+    if (!clienteId) {
+      alert("Você precisa selecionar um cliente primeiro.");
+      return;
+    }
+    window.location.href = `/cliente/${clienteId}/contatos/`;
+  }
+
+  function abrirObras() {
+    const clienteId = document.getElementById("id_cliente_id").value;
+    if (!clienteId) {
+      alert("Você precisa selecionar um cliente primeiro.");
+      return;
+    }
+    window.location.href = `/cliente/${clienteId}/obras/`;
+  }
+</script>
+
     
-    
+
+{% endblock %}
+
 
 {% endblock %}

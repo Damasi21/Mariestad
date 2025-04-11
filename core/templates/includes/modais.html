@@ -1,0 +1,122 @@
+<!-- Modal de Sucesso -->
+<div class="modal fade" id="modalSucesso" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header bg-success text-white">
+        <h5 class="modal-title">Sucesso</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <p id="modalMensagemSucesso">Ação realizada com sucesso!</p>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-primary" data-bs-dismiss="modal">OK</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal de Confirmação Genérica -->
+<div class="modal fade" id="modalConfirmacao" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <!-- Cabeçalho com cor dinâmica -->
+      <div class="modal-header text-white" id="modalHeaderConfirmacao">
+        <h5 class="modal-title">Confirmação</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <p id="modalMensagemConfirmacao">Deseja continuar?</p>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+        <button class="btn btn-danger" id="btnConfirmarAcao">Sim</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Scripts para os modais -->
+<script>
+function exibirModalSucesso(mensagem) {
+  const msg = document.getElementById('modalMensagemSucesso');
+  msg.textContent = mensagem;
+  const modal = new bootstrap.Modal(document.getElementById('modalSucesso'));
+  modal.show();
+}
+
+// tipo = 'success', 'danger', 'warning'
+function confirmarAcao(mensagem, callback, tipo = 'warning') {
+  document.getElementById('modalMensagemConfirmacao').textContent = mensagem;
+
+  const header = document.getElementById('modalHeaderConfirmacao');
+  header.classList.remove('bg-success', 'bg-danger', 'bg-warning');
+
+  if (tipo === 'success') {
+    header.classList.add('bg-success');
+  } else if (tipo === 'danger') {
+    header.classList.add('bg-danger');
+  } else {
+    header.classList.add('bg-warning');
+  }
+
+  const btn = document.getElementById('btnConfirmarAcao');
+  btn.onclick = () => {
+    const confirmModal = bootstrap.Modal.getInstance(document.getElementById('modalConfirmacao'));
+    confirmModal.hide();
+    callback();
+  };
+
+  const modal = new bootstrap.Modal(document.getElementById('modalConfirmacao'));
+  modal.show();
+}
+</script>
+
+
+<!-- Scripts para os ANEXOS DE OBRAS -->
+
+<!-- Modal de Anexos com Upload -->
+<div class="modal fade" id="modalAnexos" tabindex="-1" aria-labelledby="modalAnexosLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content border-primary">
+      <div class="modal-header bg-primary text-white">
+        <h5 class="modal-title" id="modalAnexosLabel">Anexos da Obra</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Fechar"></button>
+      </div>
+      <div class="modal-body">
+        <ul id="lista-anexos" class="list-group mb-3">
+          <!-- Populado via JS -->
+        </ul>
+        <label for="id_arquivo_modal">Adicionar novos arquivos:</label>
+        <input type="file" name="arquivo" id="id_arquivo_modal" multiple class="form-control">
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" onclick="salvarAnexos()">Salvar Anexos</button>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+<!-- Modal de Confirmação de Exclusão de Anexo -->
+<div class="modal fade" id="modalConfirmarExclusaoAnexo" tabindex="-1" aria-labelledby="tituloConfirmarExclusaoAnexo" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content border-danger">
+      <div class="modal-header bg-danger text-white">
+        <h5 class="modal-title" id="tituloConfirmarExclusaoAnexo">Confirmar Exclusão</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Fechar"></button>
+      </div>
+      <div class="modal-body">
+        Deseja realmente excluir este anexo?
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+        <button type="button" class="btn btn-danger" id="btnConfirmarExclusaoAnexo">Excluir</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
