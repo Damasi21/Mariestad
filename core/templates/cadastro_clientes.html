@@ -1,31 +1,29 @@
-{% extends "base.html" %}
+{% extends 'base.html' %}
 {% load static %}
+
 {% block content %}
+<div class="container mt-5" data-cliente-salvo="{{ sucesso|yesno:'true,false' }}">
+  <h2 class="mb-4">Cadastro de Clientes</h2>
 
-
-<div class="container mt-4">
-  <h2>Cadastro de Clientes</h2>
-
-  <!-- Abas -->
-  <ul class="nav nav-tabs" id="clienteTabs" role="tablist">
-    <li class="nav-item">
-      <button class="nav-link active" id="form-tab" data-bs-toggle="tab" data-bs-target="#formCliente" type="button" role="tab">Formulário</button>
+  <!-- Nav Abas -->
+  <ul class="nav nav-tabs mb-3" id="abasCliente" role="tablist">
+    <li class="nav-item" role="presentation">
+      <button class="nav-link active" id="aba-cadastro-tab" data-bs-toggle="tab" data-bs-target="#aba-cadastro" type="button" role="tab">Cadastro</button>
     </li>
-    <li class="nav-item">
-      <button class="nav-link" id="lista-tab" data-bs-toggle="tab" data-bs-target="#listaClientes" type="button" role="tab">Listagem</button>
+    <li class="nav-item" role="presentation">
+      <button class="nav-link" id="aba-listagem-tab" data-bs-toggle="tab" data-bs-target="#aba-listagem" type="button" role="tab">Listagem</button>
     </li>
   </ul>
 
-  <div class="tab-content border border-top-0 p-3" id="clienteTabsContent">
-    <!-- FORMULÁRIO -->
-    <div class="tab-pane fade show active" id="formCliente" role="tabpanel">
-      <form method="POST" id="clienteForm">
+  <div class="tab-content" id="conteudoAbasCliente">
+    <!-- Aba Cadastro -->
+    <div class="tab-pane fade show active" id="aba-cadastro" role="tabpanel">
+      <form method="POST" id="formCliente">
         {% csrf_token %}
         <input type="hidden" name="cliente_id" id="id_cliente_id">
 
         {% if form.errors %}
         <div class="alert alert-danger">
-          <strong>Erro ao salvar o cliente:</strong>
           <ul>
             {% for field in form %}
               {% for error in field.errors %}
@@ -34,239 +32,146 @@
             {% endfor %}
           </ul>
         </div>
-          {% endif %}
-            
-          <div class="row align-items-end">
-            <!-- Campo de CNPJ -->
-            <div class="col-md-6 mb-3">
-              <label class="form-label">CNPJ</label>
-              <div class="input-group">
-                {{ form.cnpj }}
-                <button type="button" class="btn btn-sm btn-success" onclick="buscarCNPJ()" style="white-space: nowrap;">🔍 Buscar</button>
-              </div>
-            </div>
-          
-            <!-- Botão Contatos -->
-            <div class="col-md-3 mb-3">
-              <label class="form-label d-block">&nbsp;</label>
-              <a href="#" onclick="abrirContatos()" class="btn btn-sm btn-outline-primary w-100">👤 Contatos</a>
-            </div>
-          
-            <!-- Botão Obras -->
-            <div class="col-md-3 mb-3">
-              <label class="form-label d-block">&nbsp;</label>
-              <a href="#" onclick="abrirObras()" class="btn btn-sm btn-outline-warning w-100">🏗️ Obras</a>
-            </div>
-          </div>
-        
-        <!-- Linha 2: Razão Social e Nome Fantasia -->
-        <div class="row">
-          <div class="col-md-6 mb-3">
-            <label>Razão Social</label>
-            {{ form.razao_social }}
-          </div>
-          <div class="col-md-6 mb-3">
-            <label>Nome Fantasia</label>
-            {{ form.nome_fantasia }}
-          </div>
-        </div>
+        {% endif %}
 
-        <!-- Linha 3: Endereço, Número, Complemento -->
-        <div class="row">
-          <div class="col-md-5 mb-3">
-            <label>Endereço</label>
-            {{ form.endereco }}
+        <div class="row g-3">
+          <div class="col-md-4">
+            {{ form.cnpj.label_tag }} {{ form.cnpj }}
           </div>
-          <div class="col-md-2 mb-3">
-            <label>Número</label>
-            {{ form.numero }}
+          <div class="col-md-2 d-flex align-items-end">
+            <button type="button" id="btnBuscarCNPJ" class="btn btn-primary">Buscar CNPJ</button>
           </div>
-          <div class="col-md-5 mb-3">
-            <label>Complemento</label>
-            {{ form.complemento }}
-          </div>
-        </div>
 
-        <!-- Linha 4: Bairro, CEP -->
-        <div class="row">
-          <div class="col-md-6 mb-3">
-            <label>Bairro</label>
-            {{ form.bairro }}
+          <div class="col-md-6">
+            {{ form.razao_social.label_tag }} {{ form.razao_social }}
           </div>
-          <div class="col-md-6 mb-3">
-            <label>CEP</label>
-            {{ form.cep }}
-          </div>
-        </div>
 
-        <!-- Linha 5: Cidade, Estado -->
-        <div class="row">
-          <div class="col-md-8 mb-3">
-            <label>Cidade</label>
-            {{ form.cidade }}
+          <div class="col-md-6">
+            {{ form.nome_fantasia.label_tag }} {{ form.nome_fantasia }}
           </div>
-          <div class="col-md-4 mb-3">
-            <label>Estado</label>
-            {{ form.estado }}
-          </div>
-        </div>
 
-        <!-- Linha 6: Email, Telefone -->
-        <div class="row">
-          <div class="col-md-6 mb-3">
-            <label>Email</label>
-            {{ form.email }}
+          <div class="col-md-6">
+            {{ form.email.label_tag }} {{ form.email }}
           </div>
-          <div class="col-md-6 mb-3">
-            <label>Telefone</label>
-            {{ form.telefone }}
-          </div>
-        </div>
 
-        <!-- Linha 7: Status e Tags -->
-        <div class="row">
-          <div class="col-md-4 mb-3">
-            <label>Status</label>
-            {{ form.status }}
+          <div class="col-md-6">
+            {{ form.telefone.label_tag }} {{ form.telefone }}
           </div>
-          <div class="col-md-8 mb-3">
-            <label>Tags</label>
+
+          <div class="col-md-6">
+            {{ form.endereco.label_tag }} {{ form.endereco }}
+          </div>
+          <div class="col-md-2">
+            {{ form.numero.label_tag }} {{ form.numero }}
+          </div>
+          <div class="col-md-4">
+            {{ form.complemento.label_tag }} {{ form.complemento }}
+          </div>
+
+          <div class="col-md-4">
+            {{ form.bairro.label_tag }} {{ form.bairro }}
+          </div>
+          <div class="col-md-3">
+            {{ form.cep.label_tag }} {{ form.cep }}
+          </div>
+          <div class="col-md-3">
+            {{ form.cidade.label_tag }} {{ form.cidade }}
+          </div>
+          <div class="col-md-2">
+            {{ form.estado.label_tag }} {{ form.estado }}
+          </div>
+
+          <div class="col-md-4">
+            {{ form.status.label_tag }} {{ form.status }}
+          </div>
+          <div class="col-md-6 mb-3">
+            <label for="id_tags" class="form-label">Tags</label>
             {{ form.tags }}
           </div>
-        </div>
+          
+          <div class="col-md-6 mb-3">
+            <label class="form-label invisible">Contatos</label>
+            <button type="button" class="btn btn-outline-primary w-100 h-100" onclick="abrirModalContatos()">Contatos</button>
+          </div>
 
-        <!-- Observações -->
-        <div class="mb-3">
-          <label>Observações</label>
-          {{ form.observacoes }}
-        </div>
+          <div class="col-md-12">
+            {{ form.observacoes.label_tag }} {{ form.observacoes }}
+          </div>
 
-        <!-- Botões -->
-        <div class="d-flex justify-content-end gap-2">
-            <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#confirmarSalvarCliente">Salvar</button>
-            <a href="{% url 'index' %}" class="btn btn-secondary">Cancelar</a>
-            <button type="button" id="btnExcluirCliente" class="btn btn-danger d-none" data-bs-toggle="modal" data-bs-target="#confirmarExcluirCliente">Excluir</button>
+          <div class="col-md-12 d-flex justify-content-end gap-2 mt-3">
+            <button type="button" class="btn btn-success" onclick="confirmarSalvar()">Salvar</button>
+            <button type="reset" class="btn btn-secondary">Cancelar</button>
+            <button type="button" class="btn btn-danger" onclick="confirmarExclusaoCliente()">Excluir</button>
+          </div>
         </div>
       </form>
     </div>
 
-    <!-- LISTAGEM -->
-    <div class="tab-pane fade" id="listaClientes" role="tabpanel">
-      <div class="table-responsive">
-        <table class="table table-striped table-hover table-bordered" id="tabelaClientes">
-          <thead class="table-light">
-            <tr>
-              <th>Status<br><input class="form-control form-control-sm filtro" /></th>
-              <th>Tags<br><input class="form-control form-control-sm filtro" /></th>
-              <th>Nome Fantasia<br><input class="form-control form-control-sm filtro" /></th>
-              <th>Razão Social<br><input class="form-control form-control-sm filtro" /></th>
-              <th>Endereço<br><input class="form-control form-control-sm filtro" /></th>
-              <th>Número<br><input class="form-control form-control-sm filtro" /></th>
-              <th>Bairro<br><input class="form-control form-control-sm filtro" /></th>
-              <th>CEP<br><input class="form-control form-control-sm filtro" /></th>
-              <th>Complemento<br><input class="form-control form-control-sm filtro" /></th>
-              <th>Cidade<br><input class="form-control form-control-sm filtro" /></th>
-              <th>Estado<br><input class="form-control form-control-sm filtro" /></th>
-            </tr>
-          </thead>
-          <tbody>
-            {% for cliente in clientes %}
-              <tr ondblclick="carregarCliente('{{ cliente.id }}')">
-                <td>{{ cliente.status }}</td>
-                <td>{% for tag in cliente.tags.all %}<span class="badge bg-secondary">{{ tag }}</span> {% endfor %}</td>
-                <td>{{ cliente.nome_fantasia }}</td>
-                <td>{{ cliente.razao_social }}</td>
-                <td>{{ cliente.endereco }}</td>
-                <td>{{ cliente.numero }}</td>
-                <td>{{ cliente.bairro }}</td>
-                <td>{{ cliente.cep }}</td>
-                <td>{{ cliente.complemento }}</td>
-                <td>{{ cliente.cidade }}</td>
-                <td>{{ cliente.estado }}</td>
-              </tr>
-            {% endfor %}
-          </tbody>
-        </table>
+    <!-- Aba Listagem -->
+    <div class="tab-pane fade" id="aba-listagem" role="tabpanel">
+      <div class="row mb-3">
+        <div class="col-md-4">
+          <input type="text" class="form-control" placeholder="Buscar por Razão Social..." onkeyup="filtrarTabela(this, 0)">
+        </div>
+        <div class="col-md-4">
+          <input type="text" class="form-control" placeholder="Buscar por CNPJ..." onkeyup="filtrarTabela(this, 1)">
+        </div>
+        <div class="col-md-4">
+          <input type="text" class="form-control" placeholder="Buscar por Cidade..." onkeyup="filtrarTabela(this, 2)">
+        </div>
       </div>
+
+      <table class="table table-striped table-bordered">
+        <thead>
+          <tr>
+            <th>Razão Social</th>
+            <th>CNPJ</th>
+            <th>Cidade</th>
+            <th>Status</th>
+            <th>Ações</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for cliente in clientes %}
+          <tr>
+            <td>{{ cliente.razao_social }}</td>
+            <td>{{ cliente.cnpj }}</td>
+            <td>{{ cliente.cidade }}</td>
+            <td>{{ cliente.status.nome }}</td>
+            <td>
+              <button class="btn btn-warning btn-sm"
+                data-id="{{ cliente.id }}"
+                data-cnpj="{{ cliente.cnpj }}"
+                data-razao_social="{{ cliente.razao_social|escapejs }}"
+                data-nome_fantasia="{{ cliente.nome_fantasia|escapejs }}"
+                data-email="{{ cliente.email }}"
+                data-telefone="{{ cliente.telefone }}"
+                data-endereco="{{ cliente.endereco|escapejs }}"
+                data-numero="{{ cliente.numero }}"
+                data-complemento="{{ cliente.complemento }}"
+                data-bairro="{{ cliente.bairro }}"
+                data-cep="{{ cliente.cep }}"
+                data-cidade="{{ cliente.cidade }}"
+                data-estado="{{ cliente.estado }}"
+                data-status="{{ cliente.status.id|default_if_none:'' }}"
+                data-tags="{% for tag in cliente.tags.all %}{{ tag.id }}{% if not forloop.last %},{% endif %}{% endfor %}"
+                data-observacoes="{{ cliente.observacoes|default_if_none:''|escapejs }}"
+                onclick="editarCliente(this)">Editar</button>
+            </td>
+          </tr>
+          {% empty %}
+          <tr><td colspan="5">Nenhum cliente cadastrado.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
     </div>
   </div>
 </div>
 
+{% endblock %}
+
 {% block scripts %}
-
-<!-- JS para carregar cliente e aplicar filtros -->
-
-<script>
-   function carregarCliente(id) {
-    fetch(`/editar_cliente/${id}/`)
-    .then(response => response.json())
-    .then(data => {
-      for (const campo in data) {
-        if (campo === "tags") {
-          const select = document.getElementById("id_tags");
-          if (select) {
-            $(select).val(data.tags).trigger("change");
-          }
-        } else if (campo === "status") {
-          const select = document.getElementById("id_status");
-          if (select) select.value = data.status;
-        } else {
-          const input = document.getElementById(`id_${campo}`);
-          if (input) input.value = data[campo];
-        }
-      }
-
-      // Preenche o campo oculto com o ID do cliente
-      document.getElementById("id_cliente_id").value = data.id;
-
-      // Ativa botão de exclusão
-      document.getElementById("btnExcluirCliente").classList.remove("d-none");
-      document.getElementById("formExcluirCliente").action = `/excluir_cliente/${data.id}/`;
-
-      // Abre a aba do formulário
-      document.getElementById("form-tab").click();
-    });
-  }
-    
-
-  document.querySelectorAll('.filtro').forEach((input, index) => {
-    input.addEventListener('keyup', function () {
-      const filtro = this.value.toLowerCase();
-      const linhas = document.querySelectorAll("#tabelaClientes tbody tr");
-      linhas.forEach(linha => {
-        const celula = linha.cells[index].innerText.toLowerCase();
-        linha.style.display = celula.includes(filtro) ? "" : "none";
-      });
-    });
-  });
-
-</script>
-
-<!-- JS DOS BOTOES PARA CONTATOS E OBRAS  -->
-
-<script>
-  function abrirContatos() {
-    const clienteId = document.getElementById("id_cliente_id").value;
-    if (!clienteId) {
-      alert("Você precisa selecionar um cliente primeiro.");
-      return;
-    }
-    window.location.href = `/cliente/${clienteId}/contatos/`;
-  }
-
-  function abrirObras() {
-    const clienteId = document.getElementById("id_cliente_id").value;
-    if (!clienteId) {
-      alert("Você precisa selecionar um cliente primeiro.");
-      return;
-    }
-    window.location.href = `/cliente/${clienteId}/obras/`;
-  }
-</script>
-
-    
-
+  <script src="{% static 'js/cliente.js' %}?v={{ now|date:"U" }}"></script>
 {% endblock %}
 
 
-{% endblock %}

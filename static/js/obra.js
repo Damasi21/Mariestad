@@ -1,169 +1,131 @@
+// Ao carregar a página
 document.addEventListener('DOMContentLoaded', function () {
-    if (document.body.dataset.obraSalva === 'true') {
-      exibirModalSucesso('Obra salva com sucesso!');
-    }
-  
-    // Ativa Select2 no campo de tags
-    const selectTags = document.getElementById('id_tags');
-    if (selectTags) {
-      $(selectTags).select2({
-        placeholder: "Selecione as tags",
-        width: '100%',
-        allowClear: true
-      });
-    }
-  });
+  if (document.body.dataset.obraSalva === 'true') {
+    exibirModalSucesso('Obra salva com sucesso!');
+  }
 
-  function adicionarResponsavel(valorSelecionado = null) {
-    const container = document.getElementById('responsaveis-container');
-    const grupo = document.createElement('div');
-    grupo.classList.add('input-group', 'mb-2');
-  
-    const select = document.createElement('select');
-    select.name = 'responsaveis';
-    select.classList.add('form-select');
-  
-    const original = document.querySelector('select[name=responsaveis]');
-    if (original) {
-      original.querySelectorAll('option').forEach(opt => {
-        const clone = opt.cloneNode(true);
-        if (valorSelecionado && clone.value === valorSelecionado) {
-          clone.selected = true;
+  const selectTags = document.getElementById('id_tags');
+  if (selectTags) {
+    $(selectTags).select2({
+      placeholder: "Selecione as tags",
+      width: '100%',
+      allowClear: true
+    });
+  }
+
+  const btnConfirmar = document.getElementById('btnConfirmarExclusaoAnexo');
+  if (btnConfirmar) {
+    btnConfirmar.addEventListener('click', function () {
+      if (!urlParaExcluir) return;
+
+      fetch('/obras/excluir-anexo/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken': getCookie('csrftoken')
+        },
+        body: JSON.stringify({ url: urlParaExcluir })
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.status === 'ok') {
+          const obraId = sessionStorage.getItem('obraIdSelecionada');
+          carregarAnexos(obraId);
+        } else {
+          alert("Erro ao excluir o anexo.");
         }
-        select.appendChild(clone);
-      });
-    }
-  
-    const btnRemover = document.createElement('button');
-    btnRemover.type = 'button';
-    btnRemover.classList.add('btn', 'btn-outline-danger');
-    btnRemover.textContent = '-';
-    btnRemover.onclick = () => grupo.remove();
-  
-    grupo.appendChild(select);
-    grupo.appendChild(btnRemover);
-    container.appendChild(grupo);
-  }
+      })
+      .catch(() => alert("Erro na comunicação com o servidor."));
 
+      const modal = bootstrap.Modal.getInstance(document.getElementById('modalConfirmarExclusaoAnexo'));
+      modal.hide();
+      urlParaExcluir = null;
+    });
+  }
+});
 
-  function confirmarSalvar() {
-    confirmarAcao('Deseja salvar esta obra?', () => {
-      document.querySelector('form').submit();
-    }, 'success');
-  }
-  
-  function confirmarExclusaoObra(id) {
-    confirmarAcao('Deseja excluir esta obra?', () => {
-      window.location.href = `/obras/excluir/${id}/`;
-    }, 'danger');
-  }
-  
-  function editarObra(botao) {
-    confirmarAcao('Deseja editar esta obra?', () => {
-      document.getElementById('id_obra_id').value = botao.dataset.id;
-      document.getElementById('id_nome').value = botao.dataset.nome;
-      document.getElementById('id_endereco').value = botao.dataset.endereco;
-      document.getElementById('id_data_inicio').value = botao.dataset.datainicio;
-      document.getElementById('id_data_termino').value = botao.dataset.datatermino;
-      document.getElementById('id_cidade').value = botao.dataset.cidade;
-      document.getElementById('id_estado').value = botao.dataset.estado;
-      document.getElementById('id_status').value = botao.dataset.status;
-  
-      const container = document.getElementById('responsaveis-container');
-      container.innerHTML = '';
-  
-      const responsaveisStr = botao.dataset.responsaveis || '';
-      const idsResponsaveis = responsaveisStr.split(',').map(s => s.trim()).filter(s => s);
-      idsResponsaveis.forEach(id => adicionarResponsavel(id));
-  
-      if (botao.dataset.tags) {
-        $('#id_tags').val(botao.dataset.tags.split(',')).trigger('change');
+// Confirma o envio do formulário
+function confirmarSalvar() {
+  confirmarAcao('Deseja salvar esta obra?', () => {
+    document.querySelector('form').submit();
+  }, 'success');
+}
+
+// Confirma a exclusão de uma obra
+function confirmarExclusaoObra(id) {
+  confirmarAcao('Deseja excluir esta obra?', () => {
+    window.location.href = `/obras/excluir/${id}/`;
+  }, 'danger');
+}
+
+// Preenche o formulário ao clicar em "Editar"
+function editarObra(botao) {
+  confirmarAcao('Deseja editar esta obra?', () => {
+    document.getElementById('id_obra_id').value = botao.dataset.id;
+    document.getElementById('id_nome').value = botao.dataset.nome;
+    document.getElementById('id_endereco').value = botao.dataset.endereco;
+    document.getElementById('id_data_inicio').value = botao.dataset.datainicio;
+    document.getElementById('id_data_termino').value = botao.dataset.datatermino;
+    document.getElementById('id_cidade').value = botao.dataset.cidade;
+    document.getElementById('id_estado').value = botao.dataset.estado;
+    document.getElementById('id_status').value = botao.dataset.status;
+
+    // Limpa os responsáveis antes de recarregar
+    const container = document.getElementById('responsaveis-container');
+    container.innerHTML = '';
+
+    const responsaveisStr = botao.dataset.responsaveis || '';
+    const idsResponsaveis = responsaveisStr.split(',').map(s => s.trim()).filter(s => s);
+
+    // Para cada ID, buscamos o cliente no array
+    idsResponsaveis.forEach(id => {
+      const cliente = clientesDisponiveis.find(c => c.id == id);
+      if (cliente) {
+        adicionarResponsavel(cliente);
+      } else {
+        console.warn(`Cliente com ID ${id} não encontrado na lista.`);
       }
     });
-  }
-  
-  function filtrarTabela(input, colunaIndex) {
-    const filtro = input.value.toLowerCase();
-    const linhas = document.querySelectorAll('table tbody tr');
-  
-    linhas.forEach(row => {
-      const celulas = row.querySelectorAll('td');
-      const texto = celulas[colunaIndex]?.innerText.toLowerCase() || '';
-      row.style.display = texto.includes(filtro) ? '' : 'none';
-    });
-  }
 
-// JS DO CAMPO DE ANEXO (OBRAS)
+    if (botao.dataset.tags) {
+      $('#id_tags').val(botao.dataset.tags.split(',')).trigger('change');
+    }
+  });
+}
+
+
+// Filtra tabela da listagem por coluna
+function filtrarTabela(input, colunaIndex) {
+  const filtro = input.value.toLowerCase();
+  const linhas = document.querySelectorAll('table tbody tr');
+
+  linhas.forEach(row => {
+    const celulas = row.querySelectorAll('td');
+    const texto = celulas[colunaIndex]?.innerText.toLowerCase() || '';
+    row.style.display = texto.includes(filtro) ? '' : 'none';
+  });
+}
+
+// ------------------------ ANEXOS ------------------------
+
 function abrirModalInserirAnexos() {
   const lista = document.getElementById('lista-anexos');
   lista.innerHTML = '';
 
-  // Lista os arquivos que já estão visíveis (do formulário anterior)
   const existingFiles = document.querySelectorAll('#lista-anexos li');
   if (existingFiles.length === 0) {
     lista.innerHTML = '<li class="list-group-item">Nenhum anexo encontrado.</li>';
   }
 
-  // Copia arquivos selecionados do input principal (caso tenha algum carregado)
   const inputOriginal = document.getElementById('id_arquivo');
   const inputModal = document.getElementById('id_arquivo_modal');
 
   inputModal.addEventListener('change', function () {
-    const files = inputModal.files;
     inputOriginal.files = inputModal.files;
   });
 
   new bootstrap.Modal(document.getElementById('modalAnexos')).show();
 }
-
-// SALVAR ANEXO 
-function salvarAnexos() {
-  const inputModal = document.getElementById('id_arquivo_modal');
-  const inputForm = document.getElementById('id_arquivo');
-
-  if (inputModal.files.length === 0) {
-    alert("Selecione pelo menos um arquivo.");
-    return;
-  }
-
-  // Não é possível transferir programaticamente os arquivos de um input para outro
-  // Mas podemos simplesmente usar os arquivos selecionados no modal no input real
-  // Então mostramos uma mensagem e fechamos o modal
-
-  const modal = bootstrap.Modal.getInstance(document.getElementById('modalAnexos'));
-  modal.hide();
-
-  exibirModalSucesso("Arquivos anexados ao cadastro. Clique em Salvar para concluir.");
-}
-
-
-
-function getCookie(name) {
-  let cookieValue = null;
-  if (document.cookie && document.cookie !== '') {
-    const cookies = document.cookie.split(';');
-    for (let i = 0; i < cookies.length; i++) {
-      const cookie = cookies[i].trim();
-      if (cookie.substring(0, name.length + 1) === (name + '=')) {
-        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-        break;
-      }
-    }
-  }
-  return cookieValue;
-}
-
-//----------------------------------------------------------------------------
-
-function abrirModalAnexos(botao) {
-  const obraId = botao.dataset.id;
-  sessionStorage.setItem('obraIdSelecionada', obraId);
-  carregarAnexos(obraId); // Agora os arquivos virão do servidor
-
-  new bootstrap.Modal(document.getElementById('modalAnexos')).show();
-}
-
-// -------------------------------------------------------------------------------
 
 function salvarAnexos() {
   const input = document.getElementById('id_arquivo_modal');
@@ -192,8 +154,6 @@ function salvarAnexos() {
   .then(data => {
     if (data.status === 'ok') {
       input.value = '';
-
-      // Recarrega os anexos no modal sem fechar
       carregarAnexos(obraId);
     } else {
       alert("Erro ao salvar os arquivos.");
@@ -205,23 +165,6 @@ function salvarAnexos() {
   });
 }
 
-
-// --------------------------------------------------------------------------
-function getCookie(name) {
-  let cookieValue = null;
-  if (document.cookie && document.cookie !== '') {
-    const cookies = document.cookie.split(';');
-    for (let i = 0; i < cookies.length; i++) {
-      const cookie = cookies[i].trim();
-      if (cookie.substring(0, name.length + 1) === (name + '=')) {
-        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-        break;
-      }
-    }
-  }
-  return cookieValue;
-}
-// ------------------------------------------------------------------------
 function carregarAnexos(obraId) {
   fetch(`/obras/listar-anexos/${obraId}/`)
     .then(res => res.json())
@@ -241,18 +184,21 @@ function carregarAnexos(obraId) {
         li.innerHTML = `
           <div class="d-flex justify-content-between align-items-center w-100">
             <a href="${url}" target="_blank">${nome}</a>
-            <button class="btn btn-sm btn-outline-danger ms-2" onclick="confirmarExclusaoAnexo('${url}')">
-              &times;
-            </button>
+            <button class="btn btn-sm btn-outline-danger ms-2" onclick="confirmarExclusaoAnexo('${url}')">&times;</button>
           </div>
         `;
-
         lista.appendChild(li);
       });
     });
 }
 
-// -----------------------------------------------------------------
+function abrirModalAnexos(botao) {
+  const obraId = botao.dataset.id;
+  sessionStorage.setItem('obraIdSelecionada', obraId);
+  carregarAnexos(obraId);
+
+  new bootstrap.Modal(document.getElementById('modalAnexos')).show();
+}
 
 let urlParaExcluir = null;
 
@@ -262,34 +208,76 @@ function confirmarExclusaoAnexo(url) {
   modal.show();
 }
 
-document.addEventListener('DOMContentLoaded', function () {
-  const btnConfirmar = document.getElementById('btnConfirmarExclusaoAnexo');
-  if (btnConfirmar) {
-    btnConfirmar.addEventListener('click', function () {
-      if (!urlParaExcluir) return;
-
-      fetch('/obras/excluir-anexo/', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-CSRFToken': getCookie('csrftoken')
-        },
-        body: JSON.stringify({ url: urlParaExcluir })
-      })
-      .then(res => res.json())
-      .then(data => {
-        if (data.status === 'ok') {
-          const obraId = sessionStorage.getItem('obraIdSelecionada');
-          carregarAnexos(obraId); // Atualiza a lista no modal
-        } else {
-          alert("Erro ao excluir o anexo.");
-        }
-      })
-      .catch(() => alert("Erro na comunicação com o servidor."));
-
-      const modal = bootstrap.Modal.getInstance(document.getElementById('modalConfirmarExclusaoAnexo'));
-      modal.hide();
-      urlParaExcluir = null;
-    });
+function getCookie(name) {
+  let cookieValue = null;
+  if (document.cookie && document.cookie !== '') {
+    const cookies = document.cookie.split(';');
+    for (let i = 0; i < cookies.length; i++) {
+      const cookie = cookies[i].trim();
+      if (cookie.substring(0, name.length + 1) === (name + '=')) {
+        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+        break;
+      }
+    }
   }
-});
+  return cookieValue;
+}
+
+// RESPONSAVEIS -------------------------------------
+// --------------------- NOVA BUSCA DE RESPONSÁVEIS ---------------------
+
+window.filtrarClientes = function () {
+  const termo = document.getElementById('buscaCliente').value.toLowerCase().trim();
+  const container = document.getElementById('listaClientesResultado');
+  container.innerHTML = '';
+
+  if (!termo) {
+    container.innerHTML = '<div class="text-muted p-2">Digite parte do nome para buscar.</div>';
+    return;
+  }
+
+  const resultados = clientesDisponiveis.filter(c => c.nome.toLowerCase().includes(termo));
+
+  if (resultados.length === 0) {
+    container.innerHTML = '<div class="text-danger p-2">Nenhum cliente encontrado.</div>';
+    return;
+  }
+
+  resultados.forEach(cliente => {
+    const item = document.createElement('div');
+    item.className = 'list-group-item list-group-item-action';
+    item.innerHTML = `<strong>${cliente.nome}</strong><br><small>${cliente.tag}</small>`;
+    item.ondblclick = () => adicionarResponsavel(cliente);
+    container.appendChild(item);
+  });
+};
+
+function adicionarResponsavel(cliente) {
+  const container = document.getElementById("responsaveis-container");
+
+  if (document.getElementById(`responsavel-${cliente.id}`)) {
+    alert("Este cliente já foi adicionado.");
+    return;
+  }
+
+  const div = document.createElement("div");
+  div.classList.add("d-flex", "align-items-center", "mb-2");
+  div.id = `responsavel-${cliente.id}`;
+
+  div.innerHTML = `
+    <div class="flex-grow-1 p-2 border rounded bg-light me-2">
+      <strong>${cliente.nome}</strong><br><small>${cliente.tag}</small>
+    </div>
+    <button type="button" class="btn btn-outline-danger btn-sm" onclick="removerResponsavel(${cliente.id})">&times;</button>
+    <input type="hidden" name="responsaveis" value="${cliente.id}">
+  `;
+
+  container.appendChild(div);
+  document.getElementById('buscaCliente').value = '';
+  document.getElementById('listaClientesResultado').innerHTML = '';
+}
+
+window.removerResponsavel = function (id) {
+  const div = document.getElementById(`responsavel-${id}`);
+  if (div) div.remove();
+};

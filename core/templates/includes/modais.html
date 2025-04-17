@@ -119,4 +119,70 @@ function confirmarAcao(mensagem, callback, tipo = 'warning') {
   </div>
 </div>
 
+<!--------------------------------------------------------------------------------------------- -->
+<!-- Modal de CONTATO EM CLIENTES  -->
+
+<div class="modal fade" id="modalContatosCliente" tabindex="-1">
+  <div class="modal-dialog modal-xl modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header bg-primary text-white">
+        <h5 class="modal-title">Contatos do Cliente</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+
+        <h6>Adicionar Novo Contato</h6>
+        <form id="formNovoContato" method="POST">      
+          <input type="hidden" name="cliente_id" id="contato_cliente_id">
+          <input type="hidden" name="contato_id" id="id_contato_id">
+          <div class="row g-2">
+            <div class="col-md-6">
+              <input type="text" class="form-control" name="nome" placeholder="Nome" required>
+            </div>
+            <div class="col-md-6">
+              <input type="text" class="form-control" name="cargo" placeholder="Cargo" required>
+            </div>
+            <div class="col-md-6">
+              <input type="text" class="form-control" name="telefone1" placeholder="Telefone 1">
+            </div>
+            <div class="col-md-6">
+              <input type="text" class="form-control" name="telefone2" placeholder="Telefone 2">
+            </div>
+            <div class="col-md-6">
+              <input type="email" class="form-control" name="email" placeholder="E-mail">
+            </div>
+            <div class="col-md-6">
+              <input type="text" class="form-control" name="observacoes" placeholder="Observações">
+            </div>
+          </div>
+          <div class="d-flex justify-content-end gap-2 mt-3">
+            <button type="submit" class="btn btn-success">Salvar Contato</button>
+          </div>
+        </form>
+      
+        <hr class="my-4">
+
+        <h6>Contatos cadastrados</h6>
+          <div id="listaContatosCliente" class="table-responsive">
+            <!-- conteúdo dinâmico será inserido aqui via JS -->
+            <table class="table table-striped table-bordered mt-2">
+              <thead>
+                <tr>
+                  <th>Nome</th>
+                  <th>Cargo</th>
+                  <th>Telefone(s)</th>
+                  <th>E-mail</th>
+                  <th class="text-center" style="width: 80px;">Ações</th>
+                </tr>
+              </thead>
+              <tbody id="tabelaContatosCliente">
+                <!-- linhas virão via JS -->
+              </tbody>
+            </table>
+          </div>
+
+      </div>
+    </div>
+  </div>
+</div>
 

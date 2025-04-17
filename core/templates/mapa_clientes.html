@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block title %}Mapa de Clientes{% endblock %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-4">
+  <h3 class="mb-3">Mapa de Clientes</h3>
+  <div id="map" style="height: 600px; width: 100%;"></div>
+</div>
+{% endblock %}
+
+
+
+{% block scripts %}
+<!-- Google Maps API -->
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDolIIuBXJtBa5kaMT2oAyfCXVfYc8Wrpw"></script>
+<!-- Código JS separado -->
+<script src="{% static 'js/mapa.js' %}"></script>
+{% endblock %}

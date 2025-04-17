@@ -1,11 +1,13 @@
 from decimal import Decimal
 from django import forms
 from .models import Produto
-from .models import Status, Tag
+from .models import Status, Tag, StatusCliente
 from .models import Contato
 from .models import Obra
-from .models import StatusCliente
 from django.utils.translation import gettext_lazy as _
+from .models import Cliente
+
+
 
 
 
@@ -42,36 +44,19 @@ class ProdutoForm(forms.ModelForm):
         raise forms.ValidationError("Este campo é obrigatório.")
 
 #------------------------------------------------------------------------------------
-
-class StatusForm(forms.ModelForm):
-    class Meta:
-        model = Status
-        fields = ['nome']
-        widgets = {
-            'nome': forms.TextInput(attrs={'class': 'form-control'}),
-        }
-
-class TagForm(forms.ModelForm):
-    class Meta:
-        model = Tag
-        fields = ['nome']
-        widgets = {
-            'nome': forms.TextInput(attrs={'class': 'form-control'}),
-        }
-
-#------------------------------------------------------------------------------------
 class ContatoForm(forms.ModelForm):
     class Meta:
         model = Contato
         fields = '__all__'
         widgets = {
-            'nome': forms.TextInput(attrs={'class': 'form-control'}),
-            'cargo': forms.TextInput(attrs={'class': 'form-control'}),
+            'nome': forms.TextInput(attrs={'class': 'form-control', 'id': 'id_nome'}),
+            'cargo': forms.TextInput(attrs={'class': 'form-control', 'id': 'id_cargo'}),
             'telefone1': forms.TextInput(attrs={'class': 'form-control'}),
             'telefone2': forms.TextInput(attrs={'class': 'form-control'}),
             'email': forms.EmailInput(attrs={'class': 'form-control'}),
             'observacoes': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
         }
+
    
 #------------------------------------------------------------------------------------
 
@@ -123,6 +108,22 @@ class ObraForm(forms.ModelForm):
 
 #------------------------------------------------------------------------------------
 
+class StatusForm(forms.ModelForm):
+    class Meta:
+        model = Status
+        fields = ['nome']
+        widgets = {
+            'nome': forms.TextInput(attrs={'class': 'form-control'}),
+        }
+
+class TagForm(forms.ModelForm):
+    class Meta:
+        model = Tag
+        fields = ['nome']
+        widgets = {
+            'nome': forms.TextInput(attrs={'class': 'form-control'}),
+        }
+
 class StatusClienteForm(forms.ModelForm):
     class Meta:
         model = StatusCliente
@@ -130,3 +131,35 @@ class StatusClienteForm(forms.ModelForm):
         widgets = {
             'nome': forms.TextInput(attrs={'class': 'form-control'}),
         }
+
+
+#--------------------------------------------------------------------------------
+class ClienteForm(forms.ModelForm):
+    class Meta:
+       model = Cliente
+       fields = '__all__'
+       widgets = {
+            'cnpj': forms.TextInput(attrs={'class': 'form-control', 'placeholder': '00.000.000/0000-00'}),
+            'razao_social': forms.TextInput(attrs={'class': 'form-control'}),
+            'nome_fantasia': forms.TextInput(attrs={'class': 'form-control'}),
+            'endereco': forms.TextInput(attrs={'class': 'form-control'}),
+            'numero': forms.TextInput(attrs={'class': 'form-control'}),
+            'complemento': forms.TextInput(attrs={'class': 'form-control'}),
+            'bairro': forms.TextInput(attrs={'class': 'form-control'}),
+            'cep': forms.TextInput(attrs={'class': 'form-control', 'placeholder': '00000-000'}),
+            'cidade': forms.TextInput(attrs={'class': 'form-control'}),
+            'estado': forms.Select(choices=[
+                ('AC', 'AC'), ('AL', 'AL'), ('AP', 'AP'), ('AM', 'AM'), ('BA', 'BA'),
+                ('CE', 'CE'), ('DF', 'DF'), ('ES', 'ES'), ('GO', 'GO'), ('MA', 'MA'),
+                ('MT', 'MT'), ('MS', 'MS'), ('MG', 'MG'), ('PA', 'PA'), ('PB', 'PB'),
+                ('PR', 'PR'), ('PE', 'PE'), ('PI', 'PI'), ('RJ', 'RJ'), ('RN', 'RN'),
+                ('RS', 'RS'), ('RO', 'RO'), ('RR', 'RR'), ('SC', 'SC'), ('SP', 'SP'),
+                ('SE', 'SE'), ('TO', 'TO')
+            ], attrs={'class': 'form-select'}),
+            'email': forms.EmailInput(attrs={'class': 'form-control'}),
+            'telefone': forms.TextInput(attrs={'class': 'form-control', 'placeholder': '(00) 00000-0000'}),
+            'observacoes': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
+            'status': forms.Select(attrs={'class': 'form-select'}),
+            'tags': forms.SelectMultiple(attrs={'class': 'form-select'})
+
+         }
