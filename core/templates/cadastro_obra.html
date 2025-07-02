@@ -29,6 +29,13 @@
     <div class="row mt-3">
       <div class="col-md-12">{{ form.tags.label_tag }}{{ form.tags }}</div>
     </div>
+
+    <div class="row mt-3">
+      <div class="col-md-12">
+        <label for="id_observacoes_obra" class="form-label">Observações da Obra</label>
+        {{ form.observacoes_obra }}
+      </div>
+    </div>
   
     <!-- RESPONSÁVEIS -->
     <div class="mt-4">
@@ -90,6 +97,7 @@
               data-cidade="{{ obra.cidade }}"
               data-estado="{{ obra.estado }}"
               data-status="{{ obra.status.id }}"
+              data-observacoes-obra="{{ obra.observacoes_obra|default_if_none:'' }}"
               data-tags="{% for tag in obra.tags.all %}{{ tag.id }}{% if not forloop.last %},{% endif %}{% endfor %}"
               data-responsaveis="{% for c in obra.responsaveis.all %}{{ c.id }}{% if not forloop.last %},{% endif %}{% endfor %}"
             >Editar</button>
@@ -103,6 +111,32 @@
     {% endfor %}
   </tbody>
 </table>
+<div class="d-flex justify-content-center mt-4">
+  <nav>
+    <ul class="pagination">
+      {% if obras.has_previous %}
+        <li class="page-item">
+          <a class="page-link" href="?page={{ obras.previous_page_number }}">Anterior</a>
+        </li>
+      {% else %}
+        <li class="page-item disabled"><span class="page-link">Anterior</span></li>
+      {% endif %}
+
+      <li class="page-item active">
+        <span class="page-link">{{ obras.number }}</span>
+      </li>
+
+      {% if obras.has_next %}
+        <li class="page-item">
+          <a class="page-link" href="?page={{ obras.next_page_number }}">Próxima</a>
+        </li>
+      {% else %}
+        <li class="page-item disabled"><span class="page-link">Próxima</span></li>
+      {% endif %}
+    </ul>
+  </nav>
+</div>
+
 
 </div>
 {% endblock %}

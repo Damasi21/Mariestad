@@ -17,6 +17,17 @@ document.addEventListener("DOMContentLoaded", function () {
         allowClear: true
       });
     }
+
+    // Ativa Select2 no campo de vendedores
+    const selectVendedores = document.getElementById('id_vendedores');
+    if (selectVendedores) {
+      $(selectVendedores).select2({
+        placeholder: "Selecione os vendedores",
+        width: '100%',
+        allowClear: true
+      });
+    }
+
   
     if (cnpj) {
       cnpj.addEventListener("input", function () {
@@ -73,8 +84,61 @@ function editarCliente(botao) {
     $('#id_tags').val(botao.dataset.tags.split(',')).trigger('change');
   }
 
+  if (botao.dataset.vendedores) {
+    $('#id_vendedores').val(botao.dataset.vendedores.split(',')).trigger('change');
+  }
+
   const abaCadastro = document.querySelector('#aba-cadastro-tab');
   if (abaCadastro) new bootstrap.Tab(abaCadastro).show();
+}
+
+// BOTAO EXCLUIR DE CLIENTES
+
+document.addEventListener("DOMContentLoaded", function () {
+  const botoesExcluir = document.querySelectorAll(".btn-excluir-cliente");
+
+  botoesExcluir.forEach(botao => {
+    botao.addEventListener("click", function () {
+      const clienteId = this.getAttribute("data-id");
+
+      if (confirm("Tem certeza que deseja excluir este cliente?")) {
+        fetch(`/clientes/excluir/${clienteId}/`, {
+          method: "POST",
+          headers: {
+            "X-CSRFToken": getCookie("csrftoken")
+          }
+        })
+        .then(response => {
+          if (response.ok) {
+            alert("Cliente excluído com sucesso!");
+            location.reload();
+          } else {
+            alert("Erro ao excluir cliente.");
+          }
+        })
+        .catch(error => {
+          console.error("Erro:", error);
+          alert("Erro ao excluir cliente.");
+        });
+      }
+    });
+  });
+});
+
+// Função auxiliar para obter o CSRF Token
+function getCookie(name) {
+  let cookieValue = null;
+  if (document.cookie && document.cookie !== "") {
+    const cookies = document.cookie.split(";");
+    for (let i = 0; i < cookies.length; i++) {
+      const cookie = cookies[i].trim();
+      if (cookie.substring(0, name.length + 1) === name + "=") {
+        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+        break;
+      }
+    }
+  }
+  return cookieValue;
 }
 
 
@@ -136,72 +200,80 @@ function editarCliente(botao) {
   }
   
 // ---------------------------------------------------------------------------
-// ABRIR MODAL CONTATOS 
- 
+
 function abrirModalContatos() {
-    const clienteId = document.getElementById("id_cliente_id").value;
-    if (!clienteId) {
-      exibirModalErro("Você precisa salvar o cliente antes de adicionar contatos.");
-      return;
-    }
-  
-    // Define o cliente_id oculto no form do modal
-    document.getElementById("contato_cliente_id").value = clienteId;
-  
-    // Limpa a lista
-    document.getElementById("listaContatosCliente").innerHTML = "Carregando contatos...";
-  
-    // Requisição AJAX para listar contatos do cliente
-    fetch(`/clientes/contatos/?cliente_id=${clienteId}`)
-      .then(resp => resp.json())
-      .then(data => {
-        if (data.length === 0) {
-          document.getElementById("listaContatosCliente").innerHTML = "<p>Nenhum contato encontrado.</p>";
-          return;
-        }
-  
-        const html = `
-          <table class="table table-bordered table-striped mt-3">
-            <thead>
-              <tr>
-                <th>Nome</th>
-                <th>Cargo</th>
-                <th>Telefone 1</th>
-                <th>Email</th>
-                <th class="text-center" style="width: 100px;">Ações</th>
-              </tr>
-            </thead>
-            <tbody>
-              ${data.map(contato => `
-                <tr>
-                  <td>${contato.nome}</td>
-                  <td>${contato.cargo}</td>
-                  <td>${contato.telefone1 || ''}</td>
-                  <td>${contato.email || ''}</td>
-                  <td class="text-center">
-                    <button class="btn btn-sm btn-outline-primary me-1" onclick="carregarContato(${contato.id})">
-                      <i class="bi bi-pencil"></i>
-                    </button>
-                    <button class="btn btn-sm btn-outline-danger" onclick="excluirContato(${contato.id})">
-                      <i class="bi bi-trash"></i>
-                    </button>
-                  </td>
-                </tr>
-              `).join('')}
-            </tbody>
-          </table>
-        `;
-  
-        document.getElementById("listaContatosCliente").innerHTML = html;
-      })
-      .catch(() => {
-        document.getElementById("listaContatosCliente").innerHTML = "<p class='text-danger'>Erro ao buscar contatos.</p>";
-      });
-  
-    const modal = new bootstrap.Modal(document.getElementById("modalContatosCliente"));
-    modal.show();
+  const clienteId = document.getElementById("id_cliente_id").value;
+  if (!clienteId) {
+    exibirModalErro("Você precisa salvar o cliente antes de adicionar contatos.");
+    return;
   }
-  
+
+  document.getElementById("contato_cliente_id").value = clienteId;
+
+  const container = document.getElementById("listaContatosCliente");
+  container.innerHTML = "Carregando contatos...";
+
+  fetch(`/clientes/contatos/?cliente_id=${clienteId}`)
+    .then(resp => resp.json())
+    .then(data => {
+      if (data.length === 0) {
+        container.innerHTML = "<p>Nenhum contato encontrado.</p>";
+        return;
+      }
+
+      container.innerHTML = "";  // limpa antes de adicionar a nova tabela
+
+      const tabela = document.createElement("table");
+      tabela.className = "table table-bordered table-striped mt-3";
+
+      tabela.innerHTML = `
+        <thead>
+          <tr>
+            <th>Nome</th>
+            <th>Cargo</th>
+            <th>Telefone 1</th>
+            <th>Email</th>
+            <th class="text-center" style="width: 100px;">Ações</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${data.map(contato => `
+            <tr>
+              <td>${contato.nome}</td>
+              <td>${contato.cargo}</td>
+              <td>${contato.telefone1 || ''}</td>
+              <td>${contato.email_contato || ''}</td>
+              <td class="text-center">
+                <button class="btn btn-sm btn-outline-primary me-1 btn-editar-contato" data-id="${contato.id}">
+                  <i class="bi bi-pencil"></i>
+                </button>
+                <button class="btn btn-sm btn-outline-danger" onclick="excluirContato(${contato.id})">
+                  <i class="bi bi-trash"></i>
+                </button>
+              </td>
+            </tr>
+          `).join('')}
+        </tbody>
+      `;
+
+      container.appendChild(tabela);
+
+      // Liga os eventos de edição
+      document.querySelectorAll(".btn-editar-contato").forEach(btn => {
+        btn.addEventListener("click", function (e) {
+          e.stopPropagation();
+          carregarContato(this.dataset.id);
+        });
+      });
+    })
+    .catch(() => {
+      container.innerHTML = "<p class='text-danger'>Erro ao buscar contatos.</p>";
+    });
+
+  const modal = new bootstrap.Modal(document.getElementById("modalContatosCliente"));
+  modal.show();
+}
+
   
 // Submete novo contato via AJAX
 document.getElementById("formNovoContato")?.addEventListener("submit", function (e) {
@@ -229,9 +301,15 @@ document.getElementById("formNovoContato")?.addEventListener("submit", function 
     .then(resp => resp.json())
     .then(data => {
       if (data.status === "ok") {
-        abrirModalContatos();  // Atualiza a tabela de contatos
-        form.reset();
-        document.getElementById("id_contato_id").value = "";
+        const editar = !!contatoId;
+
+        setTimeout(() => {
+          abrirModalContatos(); // Recarrega a listagem
+          if (!editar) {
+            form.reset(); // Só limpa se for novo contato
+          }
+          document.getElementById("id_contato_id").value = "";
+        }, 200);
       } else {
         exibirModalErro("Erro ao salvar contato.");
       }
@@ -240,7 +318,6 @@ document.getElementById("formNovoContato")?.addEventListener("submit", function 
       exibirModalErro("Erro inesperado ao salvar contato.");
     });
 });
-
 
 
   // EXCLUI CONTATO DE CLIENTES 
@@ -287,20 +364,38 @@ document.getElementById("formNovoContato")?.addEventListener("submit", function 
     fetch(`/clientes/contato/${id}/`)
       .then(resp => resp.json())
       .then(data => {
+        console.log("📨 Dados recebidos do contato:", data);
+  
         document.getElementById("id_contato_id").value = data.id;
         document.getElementById("contato_cliente_id").value = data.cliente_id;
-        document.querySelector('[name="nome"]').value = data.nome;
-        document.querySelector('[name="cargo"]').value = data.cargo;
-        document.querySelector('[name="telefone1"]').value = data.telefone1 || "";
-        document.querySelector('[name="telefone2"]').value = data.telefone2 || "";
-        document.querySelector('[name="email"]').value = data.email || "";
-        document.querySelector('[name="observacoes"]').value = data.observacoes || "";
+        document.getElementById("id_nome_contato").value = data.nome || "";
+        document.getElementById("id_cargo_contato").value = data.cargo || "";
+        document.getElementById("id_telefone1_contato").value = data.telefone1 || "";
+        document.getElementById("id_telefone2_contato").value = data.telefone2 || "";
+        document.getElementById("id_observacoes_contato").value = data.observacoes || "";
+  
+        // Preenche campo de perfil
+        const perfilSelect = document.getElementById("id_perfil");
+        const valorPerfil = (data.perfil || "").toUpperCase().trim();
+        perfilSelect.value = [...perfilSelect.options].some(opt => opt.value === valorPerfil) ? valorPerfil : "";
+  
+        // ✅ Garante que o campo email_contato será preenchido após o modal estar 100% carregado
+        setTimeout(() => {
+          const emailInput = document.querySelector('#formNovoContato input[name="email_contato"]');
+          if (emailInput) {
+            emailInput.value = data.email_contato || "";
+            console.log("📧 Email preenchido com (delay):", data.email_contato);
+          } else {
+            console.warn("⚠️ Campo de e-mail do contato não encontrado no DOM.");
+          }
+        }, 500);
       })
       .catch(() => {
         exibirModalErro("Erro ao carregar dados do contato.");
       });
   }
-
+  
+  
   //--------------------------------------------------------------------------
 
   // Aplica máscara nos campos de telefone dentro do modal de contatos
@@ -324,5 +419,18 @@ document.getElementById("modalContatosCliente").addEventListener("shown.bs.modal
     aplicarMascaraTelefone('[name="telefone2"]');
   }, 100); // pequeno atraso para garantir que os inputs estejam prontos
 });
+
+ //------------BUSCA CLIENTES--------------------------------------------------------------
+
+function filtrarTabela(input, colunaIndex) {
+  const filtro = input.value.toLowerCase();
+  const linhas = document.querySelectorAll("table tbody tr");
+
+  linhas.forEach(row => {
+    const celulas = row.querySelectorAll("td");
+    const texto = celulas[colunaIndex]?.innerText.toLowerCase() || '';
+    row.style.display = texto.includes(filtro) ? '' : 'none';
+  });
+}
 
   

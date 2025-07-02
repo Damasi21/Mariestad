@@ -1,7 +1,9 @@
 from pathlib import Path
 import os
+from django.urls import reverse_lazy
 
 BASE_DIR = Path(__file__).resolve().parent.parent
+print(BASE_DIR)
 
 SECRET_KEY = 'django-insecure-=g#@f3d&)u660x++(nzqe*fv0x8g9$&n#sswqwftvwrpe^qgjp'
 
@@ -20,8 +22,12 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'core',
+    'django.contrib.humanize',
+    'widget_tweaks',
 ]
 
+
+AUTH_USER_MODEL = 'core.UsuarioPersonalizado'
 # ------------------------
 # MIDDLEWARE
 # ------------------------
@@ -72,10 +78,10 @@ DATABASES = {
 # SENHA
 # ------------------------
 AUTH_PASSWORD_VALIDATORS = [
-    {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
-    {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator'},
-    {'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator'},
-    {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
+    #{'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
+    #{'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator'},
+    #{'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator'},
+    #{'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
 ]
 
 # ------------------------
@@ -90,13 +96,30 @@ USE_TZ = True
 # ARQUIVOS ESTÁTICOS
 # ------------------------
 STATIC_URL = '/static/'
-STATICFILES_DIRS = [BASE_DIR / "static"]
+
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'static'),
+]
+
 
 # ------------------------
 # MÍDIA (upload de imagens)
 # ------------------------
+
+BASE_DIR = Path(__file__).resolve().parent.parent
+
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
+
+    
+
 # ------------------------
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# ------------------------
+# REDIRECIONAMENTO APÓS LOGOUT
+# ------------------------
+LOGOUT_REDIRECT_URL = '/login/'
+LOGIN_REDIRECT_URL = reverse_lazy('index')
+

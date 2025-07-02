@@ -69,6 +69,10 @@ function editarObra(botao) {
     document.getElementById('id_cidade').value = botao.dataset.cidade;
     document.getElementById('id_estado').value = botao.dataset.estado;
     document.getElementById('id_status').value = botao.dataset.status;
+    document.getElementById('id_observacoes_obra').value = botao.dataset.observacoesObra || '';
+
+
+
 
     // Limpa os responsáveis antes de recarregar
     const container = document.getElementById('responsaveis-container');
