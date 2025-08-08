@@ -1,218 +1,210 @@
-{% extends "base.html" %}
-
-{% block title %}Cadastro de Clientes - Apolux{% endblock %}
+{% extends 'base.html' %}
+{% load static %}
 
 {% block content %}
+<div class="container mt-5" data-cliente-salvo="{{ sucesso|yesno:'true,false' }}">
+  <h2 class="mb-4">Cadastro de Clientes</h2>
 
-<div class="container mt-5">
-    <div class="card shadow-lg p-4">
-        <h3 class="text-center mb-4">Cadastro de Clientes</h3>
-        <form>
-                
-            <div class="row g-3 align-items-end">
-                <!-- Campo CNPJ e Botão Pesquisar -->
-                <div class="col-md-4">
-                    <label for="cnpj" class="form-label">CNPJ / CPF</label>
-                    <div class="input-group">
-                        <input type="text" class="form-control" id="cnpj" placeholder="Digite o CNPJ ou CPF">
-                        <button type="button" class="btn btn-primary" placeholder="00.000.000/0000-00" id="btn-pesquisar">Pesquisar</button>
-                    </div>
-                </div>
+  <!-- Nav Abas -->
+  <ul class="nav nav-tabs mb-3" id="abasCliente" role="tablist">
+    <li class="nav-item" role="presentation">
+      <button class="nav-link active" id="aba-cadastro-tab" data-bs-toggle="tab" data-bs-target="#aba-cadastro" type="button" role="tab">Cadastro</button>
+    </li>
+    <li class="nav-item" role="presentation">
+      <button class="nav-link" id="aba-listagem-tab" data-bs-toggle="tab" data-bs-target="#aba-listagem" type="button" role="tab">Listagem</button>
+    </li>
+  </ul>
 
-                <!-- Botão Contatos mais centralizado -->
-                <div class="col-md-4 d-flex justify-content-start align-items-end">
-                    <button type="button" class="btn btn-info" data-bs-toggle="modal" data-bs-target="#contatosModal">
-                        Contatos
-                    </button>
-                </div>
-            </div>
+  <div class="tab-content" id="conteudoAbasCliente">
+    <!-- Aba Cadastro -->
+    <div class="tab-pane fade show active" id="aba-cadastro" role="tabpanel">
+      <form method="POST" id="formCliente">
+        {% csrf_token %}
+        <input type="hidden" name="cliente_id" id="id_cliente_id">
 
-            <div class="row">
-                <div class="col-md-6 mb-3">
-                    <label class="form-label">Razão Social</label>
-                    <input type="text" class="form-control" placeholder="Digite a Razão Social" id="razao_social">
-                </div>
-
-                <div class="col-md-6 mb-3">
-                    <label class="form-label">Nome Fantasia</label>
-                    <input type="text" class="form-control" placeholder="Digite o Nome Fantasia" id="fantasia">
-                </div>
-            </div>
-
-            <div class="row">
-                <div class="col-md-6 mb-3">
-                    <label class="form-label">Endereço</label>
-                    <input type="text" class="form-control" placeholder="Digite aqui o endereço" id="endereco">
-                </div>
-                <div class="col-md-2 mb-3">
-                    <label class="form-label">Número</label>
-                    <input type="text" class="form-control" placeholder="Número" id="numero">
-                </div>
-                <div class="col-md-4 mb-3">
-                    <label class="form-label">Complemento</label>
-                    <input type="text" class="form-control" placeholder="Apto, Bloco, etc" id="complemento">
-                </div>
-            </div>
-
-            <div class="row">
-                <div class="col-md-4 mb-3">
-                    <label class="form-label">Bairro</label>
-                    <input type="text" class="form-control" placeholder="Digite o Bairro" id="bairro">
-                </div>
-                <div class="col-md-3 mb-3">
-                    <label class="form-label">CEP</label>
-                    <input type="text" class="form-control" placeholder="00000-000" id="cep">
-                </div>
-                <div class="col-md-3 mb-3">
-                    <label class="form-label">Cidade</label>
-                    <input type="text" class="form-control" placeholder="Digite a Cidade" id="cidade">
-                </div>
-                <div class="col-md-2 mb-3">
-                    <label class="form-label">Estado</label>
-                    <select class="form-select" id="uf">
-                        <option selected>Selecione</option>
-                        <option>AC</option>
-                        <option>AM</option>
-                        <option>RR</option>
-                        <option>PA</option>
-                        <option>AP</option>
-                        <option>RO</option>
-                        <option>TO</option>
-                        <option>MA</option>
-                        <option>PI</option>
-                        <option>CE</option>
-                        <option>RN</option>
-                        <option>PB</option>
-                        <option>PE</option>
-                        <option>AL</option>
-                        <option>SE</option>
-                        <option>BA</option>
-                        <option>MG</option>
-                        <option>ES</option>
-                        <option>RJ</option>
-                        <option>SP</option>
-                        <option>PR</option>
-                        <option>SC</option>
-                        <option>RS</option>
-                        <option>MS</option>
-                        <option>MT</option>
-                        <option>GO</option>
-                        <option>DF</option>
-                        <option>Outros</option>
-                    </select>
-                </div>
-            </div>
-
-            <div class="row">
-                <div class="col-md-6 mb-3">
-                    <label class="form-label">E-mail</label>
-                    <input type="email" class="form-control" placeholder="Digite o E-mail" id="email">
-                </div>
-                <div class="col-md-6 mb-3">
-                    <label class="form-label">Telefone</label>
-                    <input type="text" class="form-control" placeholder="(00) 00000-0000" id="telefone">
-                </div>
-            </div>
-
-            <div class="mb-3">
-                <label class="form-label">Observações</label>
-                <textarea class="form-control" rows="3"></textarea>
-            </div>
-
-            <!-- Botões -->
-            <div class="d-flex justify-content-end gap-2">
-                <button type="submit" class="btn btn-success">Salvar</button>
-                <button type="button" class="btn btn-secondary">Cancelar</button>
-                <button type="button" class="btn btn-warning">Editar</button>
-                <button type="button" class="btn btn-danger">Excluir</button>
-            </div>
-        </form>
-    </div>
-</div>
-
-<!-- Modal de Contatos -->
-<div class="modal fade" id="contatosModal" tabindex="-1" aria-labelledby="contatosModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="contatosModalLabel">Cadastro de Contatos</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <form>
-                    <div class="mb-3">
-                        <label for="nome_contato" class="form-label">Nome do Contato</label>
-                        <input type="text" class="form-control" id="nome_contato">
-                    </div>
-                    <div class="mb-3">
-                        <label for="email_contato" class="form-label">E-mail</label>
-                        <input type="email" class="form-control" id="email_contato">
-                    </div>
-                    <div class="mb-3">
-                        <label for="telefone1" class="form-label">Telefone 1</label>
-                        <input type="text" class="form-control" id="telefone1">
-                    </div>
-                    <div class="mb-3">
-                        <label for="telefone2" class="form-label">Telefone 2</label>
-                        <input type="text" class="form-control" id="telefone2">
-                    </div>
-                    <div class="d-flex gap-2">
-                        <button type="submit" class="btn btn-primary">Salvar</button>
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                        <button type="button" class="btn btn-warning">Editar</button>
-                        <button type="button" class="btn btn-danger">Excluir</button>
-                    </div>
-                </form>
-            </div>
-            <div class="modal-footer">
-                <h6 class="text-muted">Lista de Contatos</h6>
-                <ul class="list-group">
-                    <li class="list-group-item">Contato 1 - contato1@email.com - (11) 99999-9999</li>
-                    <li class="list-group-item">Contato 2 - contato2@email.com - (21) 98888-8888</li>
-                </ul>
-            </div>
+        {% if form.errors %}
+        <div class="alert alert-danger">
+          <ul>
+            {% for field in form %}
+              {% for error in field.errors %}
+                <li><strong>{{ field.label }}:</strong> {{ error }}</li>
+              {% endfor %}
+            {% endfor %}
+          </ul>
         </div>
+        {% endif %}
+
+        <div class="row g-3">
+          <div class="col-md-4">
+            {{ form.cnpj.label_tag }} {{ form.cnpj }}
+          </div>
+          <div class="col-md-2 d-flex align-items-end">
+            <button type="button" id="btnBuscarCNPJ" class="btn btn-primary">Buscar CNPJ</button>
+          </div>
+
+          <div class="col-md-6">
+            {{ form.razao_social.label_tag }} {{ form.razao_social }}
+          </div>
+
+          <div class="col-md-6">
+            {{ form.nome_fantasia.label_tag }} {{ form.nome_fantasia }}
+          </div>
+
+          <div class="col-md-6">
+            {{ form.email.label_tag }} {{ form.email }}
+          </div>
+
+          <div class="col-md-6">
+            {{ form.telefone.label_tag }} {{ form.telefone }}
+          </div>
+
+          <div class="col-md-6">
+            {{ form.endereco.label_tag }} {{ form.endereco }}
+          </div>
+          <div class="col-md-2">
+            {{ form.numero.label_tag }} {{ form.numero }}
+          </div>
+          <div class="col-md-4">
+            {{ form.complemento.label_tag }} {{ form.complemento }}
+          </div>
+
+          <div class="col-md-4">
+            {{ form.bairro.label_tag }} {{ form.bairro }}
+          </div>
+          <div class="col-md-3">
+            {{ form.cep.label_tag }} {{ form.cep }}
+          </div>
+          <div class="col-md-3">
+            {{ form.cidade.label_tag }} {{ form.cidade }}
+          </div>
+          <div class="col-md-2">
+            {{ form.estado.label_tag }} {{ form.estado }}
+          </div>
+
+          <div class="col-md-4">
+            {{ form.status.label_tag }} {{ form.status }}
+          </div>
+          <div class="col-md-6 mb-3">
+            <label for="id_vendedores" class="form-label">Vendedores</label>
+            {{ form.vendedores }}
+          </div>
+
+          <div class="col-md-6 mb-3">
+            <label for="id_tags" class="form-label">Tags</label>
+            {{ form.tags }}
+          </div>
+
+          <div class="col-md-6 mb-3>
+            <label class="form-label invisible">Contatos</label>
+            <button type="button" class="btn btn-outline-primary w-100 h-100" onclick="abrirModalContatos()">Contatos</button>
+          </div>
+
+          <div class="col-md-12">
+            {{ form.observacoes.label_tag }} {{ form.observacoes }}
+          </div>
+
+          <div class="col-md-12 d-flex justify-content-end gap-2 mt-3">
+            <button type="button" class="btn btn-success" onclick="confirmarSalvar()">Salvar</button>
+            <button type="reset" class="btn btn-secondary">Cancelar</button>
+            <button type="button" class="btn btn-danger" onclick="confirmarExclusaoCliente()">Excluir</button>
+          </div>
+        </div>
+      </form>
     </div>
+
+     <!-- Aba Listagem -->
+        <div class="tab-pane fade" id="aba-listagem" role="tabpanel">
+          <div class="row mb-3">
+            <div class="col-md-4">
+              <input type="text" class="form-control" placeholder="Buscar por Razão Social..." onkeyup="filtrarTabela(this, 0)">
+            </div>
+            <div class="col-md-4">
+              <input type="text" class="form-control" placeholder="Buscar por CNPJ..." onkeyup="filtrarTabela(this, 1)">
+            </div>
+            <div class="col-md-4">
+              <input type="text" class="form-control" placeholder="Buscar por Cidade..." onkeyup="filtrarTabela(this, 2)">
+            </div>
+          </div>
+
+          <table class="table table-striped table-bordered">
+            <thead>
+              <tr>
+                <th>Razão Social</th>
+                <th>CNPJ</th>
+                <th>Cidade</th>
+                <th>Status</th>
+                <th>Ações</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for cliente in clientes %}
+              <tr>
+                <td>{{ cliente.razao_social }}</td>
+                <td>{{ cliente.cnpj }}</td>
+                <td>{{ cliente.cidade }}</td>
+                <td>{{ cliente.status.nome }}</td>
+                <td>
+                  <button class="btn btn-warning btn-sm"
+                    data-id="{{ cliente.id }}"
+                    data-cnpj="{{ cliente.cnpj }}"
+                    data-razao_social="{{ cliente.razao_social|escape }}"
+                    data-nome_fantasia="{{ cliente.nome_fantasia|escape }}"
+                    data-email="{{ cliente.email }}"
+                    data-telefone="{{ cliente.telefone }}"
+                    data-endereco="{{ cliente.endereco|escape }}"
+                    data-numero="{{ cliente.numero }}"
+                    data-complemento="{{ cliente.complemento }}"
+                    data-bairro="{{ cliente.bairro }}"
+                    data-cep="{{ cliente.cep }}"
+                    data-cidade="{{ cliente.cidade }}"
+                    data-estado="{{ cliente.estado }}"
+                    data-status="{{ cliente.status.id|default_if_none:'' }}"
+                    data-tags="{% for tag in cliente.tags.all %}{{ tag.id }}{% if not forloop.last %},{% endif %}{% endfor %}"
+                    data-vendedores="{% for v in cliente.vendedores.all %}{{ v.id }}{% if not forloop.last %},{% endif %}{% endfor %}"
+                    data-observacoes="{{ cliente.observacoes|default_if_none:''|escape }}"
+                    onclick="editarCliente(this)">Editar</button>
+                    <button class="btn btn-sm btn-danger btn-excluir-cliente" data-id="{{ cliente.id }}">Excluir</button>
+                </td>
+              </tr>
+              {% empty %}
+              <tr><td colspan="5">Nenhum cliente cadastrado.</td></tr>
+              {% endfor %}
+            </tbody>
+          </table>
+          <div class="d-flex justify-content-center">
+            <nav>
+              <ul class="pagination">
+                {% if clientes.has_previous %}
+                  <li class="page-item">
+                    <a class="page-link" href="?page={{ clientes.previous_page_number }}#aba-listagem">Anterior</a>
+                  </li>
+                {% else %}
+                  <li class="page-item disabled"><span class="page-link">Anterior</span></li>
+                {% endif %}
+
+                {% for num in clientes.paginator.page_range %}
+                  {% if clientes.number == num %}
+                    <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+                  {% else %}
+                    <li class="page-item"><a class="page-link" href="?page={{ num }}#aba-listagem">{{ num }}</a></li>
+                  {% endif %}
+                {% endfor %}
+
+                {% if clientes.has_next %}
+                  <li class="page-item">
+                    <a class="page-link" href="?page={{ clientes.next_page_number }}#aba-listagem">Próxima</a>
+                  </li>
+                {% else %}
+                  <li class="page-item disabled"><span class="page-link">Próxima</span></li>
+                {% endif %}
+              </ul>
+            </nav>
+          </div>
+        </div>
+      </div>
 </div>
+{% endblock %}
 
-<script>
-    document.addEventListener("DOMContentLoaded", function () {
-        document.getElementById("btn-pesquisar").addEventListener("click", function () {
-            let cnpj = document.getElementById("cnpj").value.replace(/\D/g, ''); // Remove caracteres não numéricos
-    
-            if (cnpj.length !== 14) {
-                alert("CNPJ inválido! Insira um CNPJ com 14 dígitos.");
-                return;
-            }
-    
-            fetch(`/buscar_dados_empresa/?cnpj=${cnpj}`)
-                .then(response => response.json())
-                .then(data => {
-                    if (data.error) {
-                        alert("Erro ao buscar CNPJ: " + data.error);
-                    } else {
-                        // Preenchendo os campos automaticamente
-                        document.getElementById("razao_social").value = data.nome || "";
-                        document.getElementById("fantasia").value = data.fantasia || "";
-                        document.getElementById("endereco").value = data.logradouro || "";
-                        document.getElementById("numero").value = data.numero || "";
-                        document.getElementById("complemento").value = data.complemento || "";
-                        document.getElementById("bairro").value = data.bairro || "";
-                        document.getElementById("cep").value = data.cep || "";
-                        document.getElementById("cidade").value = data.municipio || "";
-                        document.getElementById("uf").value = data.uf || "";
-                        document.getElementById("email").value = data.email || "";
-                        document.getElementById("telefone").value = data.telefone || "";
-                    }
-                })
-                .catch(error => {
-                    console.error("Erro na requisição:", error);
-                    alert("Erro ao buscar os dados da empresa.");
-                });
-        });
-    });
-</script>
-    
-    
-
+{% block scripts %}
+  <script src="{% static 'js/cliente.js' %}?v={{ now|date:"U" }}"></script>
 {% endblock %}

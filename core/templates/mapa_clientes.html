@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% block title %}Mapa de Clientes{% endblock %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-4">
+  <h3 class="mb-3">Mapa de Clientes e Obras</h3>
+
+ <!-- 🔍 Filtro por status + cidade -->
+ <div class="row mb-4">
+  <!-- Filtro de status -->
+  <div class="col-md-4">
+    <label for="filtroStatus" class="form-label">Filtrar por Status:</label>
+    <select id="filtroStatus" class="form-select" onchange="filtrarMarcadoresPorStatus()">
+      <option value="">Todos</option>
+
+      <!-- Clientes -->
+      <optgroup label="Status dos Clientes">
+        <option value="parceiro">Parceiro</option>
+        <option value="premium">Premium</option>
+        <option value="ouro">Ouro</option>
+        <option value="prata">Prata</option>
+        <option value="bronze">Bronze</option>
+        <option value="risco">Risco</option>
+        <option value="inativo">Inativo</option>
+      </optgroup>
+
+      <!-- Obras -->
+      <optgroup label="Status das Obras">
+        <option value="ganha">Ganha</option>
+        <option value="perdida">Perdida</option>
+        <option value="em execução">Em Execução</option>
+        <option value="a executar">A Executar</option>
+      </optgroup>
+    </select>
+  </div>
+
+  <!-- Campo de busca por cidade -->
+  <div class="col-md-6">
+    <label for="cidadeBusca" class="form-label">Ir para uma cidade:</label>
+    <div class="input-group">
+      <input type="text" class="form-control" id="cidadeBusca" placeholder="Ex: Ribeirão Preto">
+      <button class="btn btn-outline-primary" onclick="irParaCidade()">Buscar</button>
+    </div>
+  </div>
+</div>
+
+
+  <!-- 🗺️ Mapa -->
+  <div id="map" style="height: 600px; width: 100%;"></div>
+</div>
+{% endblock %}
+
+
+
+
+{% block scripts %}
+<!-- Google Maps API -->
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDolIIuBXJtBa5kaMT2oAyfCXVfYc8Wrpw&callback=initMap" async defer></script>
+
+<!-- Código JS separado -->
+<script src="{% static 'js/mapa.js' %}"></script>
+{% endblock %}

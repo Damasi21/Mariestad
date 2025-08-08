@@ -1,0 +1,29 @@
+<!-- configuracoes.html -->
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-4">
+  <h3>Configurações</h3>
+
+  <div class="d-flex gap-3 flex-wrap mt-4">
+    <a href="{% url 'cadastro_status' %}" class="btn btn-outline-primary">
+      Cadastrar Status
+    </a>
+    <a href="{% url 'cadastro_tags' %}" class="btn btn-outline-success">
+      Cadastrar Tags
+    </a>
+    <a href="{% url 'cadastro_status_cliente' %}" class="btn btn-outline-secondary">
+      Cadastrar Status de Cliente
+    </a>
+    <a href="{% url 'cadastro_vendedores' %}" class="btn btn-outline-dark">
+      Cadastrar Vendedores
+    </a>
+
+    <a href="{% url 'cadastro_usuarios' %}" class="btn btn-outline-primary">
+      Cadastro de Usuários
+    </a>
+
+  </div>
+</div>
+{% endblock %}

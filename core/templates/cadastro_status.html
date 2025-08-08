@@ -1,200 +1,59 @@
-{% extends "base.html" %}
+{% extends 'base.html' %}
+{% load static %}
 
 {% block content %}
-<div class="container mt-5">
-    <h2>Cadastro de Status</h2>
-    <div class="card p-4 shadow-sm">
-        <form id="statusForm">
-            <div class="mb-3">
-                <label for="nome_status" class="form-label">Status</label>
-                <input type="text" class="form-control" id="nome_status" name="nome_status" placeholder="Digite o status" required>
-            </div>
-            <div class="d-flex gap-2">
-                <button type="submit" class="btn btn-primary">Salvar</button>
-                <button type="button" class="btn btn-secondary" onclick="window.location.href='/'">Cancelar</button>
-            </div>
-        </form>
+<div class="container mt-4">
+  <h3>Cadastro de Status</h3>
+
+  <form method="POST" class="mb-4">
+    {% csrf_token %}
+    <input type="hidden" name="status_id" id="id_status_id">
+    <div class="row g-2 align-items-end">
+      <div class="col-md-6">
+        <label for="id_nome">Nome</label>
+        <input type="text" name="nome" id="id_nome" value="{{ form.nome.value }}" class="form-control">
+      </div>
+      <div class="col-md-auto">
+        <button type="submit" class="btn btn-success">Salvar</button>
+        <a href="{% url 'configuracoes' %}" class="btn btn-secondary">Cancelar</a>
+      </div>
     </div>
+  </form>
 
-    <h3 class="mt-4">Status Cadastrados</h3>
+  <div class="input-group mb-3">
+    <span class="input-group-text"><i class="bi bi-search"></i></span>
+    <input type="text" class="form-control" placeholder="Buscar por nome..." onkeyup="filtrarTabela(this)">
+  </div>
 
-        <div class="input-group mb-3">
-            <input type="text" class="form-control" id="inputBuscaStatus" name="q" value="{{ query }}" placeholder="Buscar Status...">
-            <button class="btn btn-primary" id="botaoBuscarStatus">
-                🔍
-            </button>
-        </div>
-        
-    <ul class="list-group" id="listaStatus">
-        {% for status in status_list %}
-            <li class="list-group-item d-flex justify-content-between align-items-center status-item" id="status-{{ status.id }}">
-                <span class="status-text">{{ status.nome_status }}</span>
-                <div>
-                    <button class="btn btn-warning btn-sm" onclick="editarStatus('{{ status.id }}')">Editar</button>
-                    <button class="btn btn-danger btn-sm" onclick="excluirStatus('{{ status.id }}')">Excluir</button>
-                </div>
-            </li>
-            {% empty %}
-        <li class="list-group-item text-center">Nenhum status encontrado.</li>
-        {% endfor %}
-    </ul>
+  <table class="table table-bordered table-striped">
+    <thead>
+      <tr><th>Nome</th><th style="width: 150px;">Ações</th></tr>
+    </thead>
+    <tbody>
+      {% for status in lista %}
+      <tr>
+        <td>{{ status.nome }}</td>
+        <td>
+          <button class="btn btn-warning btn-sm"
+                  onclick="editarStatus('{{ status.id }}', '{{ status.nome }}')">Editar</button>
+          <button class="btn btn-danger btn-sm"
+                  onclick="confirmarExclusaoStatus('{{ status.id }}')">Excluir</button>
+        </td>
+      </tr>
+      {% empty %}
+      <tr><td colspan="2">Nenhum status cadastrado.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
 </div>
 
-{% block scripts %}
-<script>
-    $(document).ready(function () {
-
-        // ========================================
-        // SALVAR STATUS - Com prevenção de duplicação
-        // ========================================
-        $("#statusForm").off("submit").on("submit", function (event) {
-            event.preventDefault();
-
-            let nome_status = $("#nome_status").val().trim();
-
-            if (nome_status === "") {
-                exibirNotificacao("O nome do status não pode estar vazio!", "error");
-                return;
-            }
-
-            $.ajax({
-                type: "POST",
-                url: "{% url 'salvar_status' %}",
-                data: {
-                    nome_status: nome_status,
-                    csrfmiddlewaretoken: "{{ csrf_token }}"
-                },
-                success: function (response) {
-                    if (response.statuses) {
-                        $("#listaStatus").empty(); // Limpa a lista antes de atualizar
-                        response.statuses.forEach(function (status) {
-                            $("#listaStatus").append(`
-                                <li class="list-group-item d-flex justify-content-between align-items-center" id="status-${status.id}">
-                                    <span id="status-text-${status.id}">${status.nome_status}</span>
-                                    <div>
-                                        <button class="btn btn-warning btn-sm" onclick="editarStatus(${status.id})">Editar</button>
-                                        <button class="btn btn-danger btn-sm" onclick="excluirStatus(${status.id})">Excluir</button>
-                                    </div>
-                                </li>
-                            `);
-                        });
-
-                        $("#nome_status").val(""); // Limpa o campo
-                        exibirNotificacao("Status salvo com sucesso!", "success");
-                    } else {
-                        exibirNotificacao("Erro ao salvar status.", "error");
-                    }
-                },
-                error: function (xhr) {
-                    if (xhr.status === 400) {
-                        exibirNotificacao(xhr.responseJSON.error, "error");
-                    } else {
-                        exibirNotificacao("Erro ao salvar status.", "error");
-                    }
-                }
-            });
-        });
-
-        // ========================================
-        // EDITAR STATUS - Com modal
-        // ========================================
-        window.editarStatus = function (id) {
-            let statusNomeAtual = $(`#status-text-${id}`).text();  // Obtém o nome atual do status
-            $("#edit-status-id").val(id);
-            $("#edit-status-name").val(statusNomeAtual);
-            $("#modalEditarStatus").modal("show");  // Abre o modal
-        };
-
-        $("#salvarEdicao").off("click").on("click", function () {
-            let id = $("#edit-status-id").val();
-            let novoNome = $("#edit-status-name").val().trim();
-
-            if (novoNome === "") {
-                alert("O nome do status não pode estar vazio!");
-                return;
-            }
-
-            $.ajax({
-                type: "POST",
-                url: `/editar_status/${id}/`,
-                data: {
-                    nome_status: novoNome,
-                    csrfmiddlewaretoken: "{{ csrf_token }}"
-                },
-                success: function (response) {
-                    if (response.success) {
-                        $(`#status-text-${id}`).text(response.nome_status);
-                        $("#modalEditarStatus").modal("hide");  // Fecha o modal
-                        exibirNotificacao("Status atualizado com sucesso!", "success");
-                    } else {
-                        exibirNotificacao("Erro ao editar status.", "error");
-                    }
-                },
-                error: function () {
-                    exibirNotificacao("Erro ao editar status.", "error");
-                }
-            });
-        });
-
-        // ========================================
-        // EXCLUIR STATUS - Com modal
-        // ========================================
-        window.excluirStatus = function (id) {
-            $("#delete-status-id").val(id);  // Armazena o ID no modal
-            $("#modalExcluirStatus").modal("show");  // Abre o modal
-        };
-
-        $("#confirmarExclusao").off("click").on("click", function () {
-            let id = $("#delete-status-id").val();
-
-            $.ajax({
-                type: "POST",
-                url: `/excluir_status/${id}/`,
-                data: {
-                    csrfmiddlewaretoken: "{{ csrf_token }}"
-                },
-                success: function (response) {
-                    if (response.success) {
-                        $(`#status-${id}`).remove();  // Remove o item da lista
-                        $("#modalExcluirStatus").modal("hide");  // Fecha o modal
-                        exibirNotificacao("Status excluído com sucesso!", "success");
-                    } else {
-                        exibirNotificacao("Erro ao excluir status.", "error");
-                    }
-                },
-                error: function () {
-                    exibirNotificacao("Erro ao excluir status.", "error");
-                }
-            });
-        });
-
-        // ========================================
-        // FUNÇÃO DE NOTIFICAÇÃO
-        // ========================================
-        function exibirNotificacao(mensagem, tipo = "success") {
-            $("#modalNotificacaoMensagem").html(mensagem);
-
-            if (tipo === "success") {
-                $("#modalNotificacao .modal-content").addClass("border-success");
-                $("#modalNotificacaoLabel").text("Sucesso!");
-            } else {
-                $("#modalNotificacao .modal-content").addClass("border-danger");
-                $("#modalNotificacaoLabel").text("Erro!");
-            }
-
-            $("#modalNotificacao").modal("show");
-
-            // Fecha o modal automaticamente após 3 segundos
-            setTimeout(function () {
-                $("#modalNotificacao").modal("hide");
-                $("#modalNotificacao .modal-content").removeClass("border-success border-danger");
-            }, 1500);
-        }
-
+{% if mensagem %}
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      exibirModalSucesso("{{ mensagem|escapejs }}");
     });
-</script>
+  </script>
+{% endif %}
 
-
-{% endblock %}
 
 {% endblock %}
